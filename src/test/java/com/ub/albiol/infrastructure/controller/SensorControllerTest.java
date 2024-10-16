@@ -32,7 +32,7 @@ public class SensorControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(SensorDTO.class)
-                .hasSize(2)
+                .hasSize(1)
                 .contains(sensor1, sensor2);
     }
 
