@@ -24,15 +24,16 @@ public class SensorControllerTest {
     void getAllSensors() {
         SensorDTO sensor1 = SensorDTO.toObject("Location1");
         SensorDTO sensor2 = SensorDTO.toObject("Location2");
+        SensorDTO sensor3 = SensorDTO.toObject("Location3");
 
-        Mockito.when(sensorService.getAllSensors()).thenReturn(Flux.just(sensor1, sensor2));
+        Mockito.when(sensorService.getAllSensors()).thenReturn(Flux.just(sensor1, sensor2,sensor3));
 
         webTestClient.get().uri("/sensors")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(SensorDTO.class)
-                .hasSize(1)
+                .hasSize(3)
                 .contains(sensor1, sensor2);
     }
 
