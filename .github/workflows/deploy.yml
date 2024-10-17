@@ -1,0 +1,51 @@
+name: CD Deployment Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - 2-add-cd-workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build the application
+        run: ./gradlew build
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push Docker image to Azure Container Registry (ACR)
+        run: |
+          IMAGE_NAME=${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/albiol:initial
+          az acr build --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} --image $IMAGE_NAME --platform linux/amd64 .
+
+      - name: Start Azure Container App
+        run: |
+          az containerapp start --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
+
+      - name: Deploy to Azure Container Apps
+        run: |
+          az containerapp update --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --image $IMAGE_NAME
+
+      - name: Stop Azure Container App
+        if: always()
+        run: |
+          az containerapp stop --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
