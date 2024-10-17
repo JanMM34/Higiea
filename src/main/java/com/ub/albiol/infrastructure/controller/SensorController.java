@@ -4,6 +4,7 @@ import com.ub.albiol.application.SensorDTO.SensorDTO;
 import com.ub.albiol.application.service.SensorService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -23,5 +24,11 @@ public class SensorController {
     @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<SensorDTO> getAllSensors() {
         return sensorService.getAllSensors();
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<SensorDTO> getSensor() {
+        // Returning an empty Flux for testing purposes
+        return Flux.empty();
     }
 }

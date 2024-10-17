@@ -44,4 +44,4 @@ jobs:
           acrName: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}
           containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
           resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          imageToDeploy: myregistry.azurecr.io/app:initial
+          imageToDeploy: ${{ secrets.REGISTRY_LOGIN_SERVER }}/albiol:initial
