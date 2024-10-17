@@ -28,14 +28,20 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build Docker image locally
-        run: docker build --platform linux/amd64 -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/albiol:initial .
+      - name: Build and push image
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/albiol:initial
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/albiol:initial
 
-      - name: Push Docker image to ACR
-        run: docker push ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/albiol:initial
-
-      - name: Deploy to Azure Container Apps
-        run: |
-          az containerapp update --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --image $IMAGE_NAME
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          acrName: ${{ secrets.AZURE_CONTAINER_REGISTRY_NAME }}
+          containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          imageToDeploy: myregistry.azurecr.io/app:initial
