@@ -3,9 +3,7 @@ package com.ub.albiol.infrastructure.controller;
 import com.ub.albiol.application.SensorDTO.SensorDTO;
 import com.ub.albiol.application.service.SensorService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 @RestController
@@ -23,5 +21,11 @@ public class SensorController {
     @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<SensorDTO> getAllSensors() {
         return sensorService.getAllSensors();
+    }
+
+    @GetMapping(params = "id", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<SensorDTO> getSensor(@RequestParam("id") String sensorId) {
+        // Returning an empty Flux for testing purposes
+        return Flux.empty();
     }
 }
