@@ -1,6 +1,6 @@
-package com.ub.albiol.domain.repository;
+package com.ub.higiea.domain.repository;
 
-import com.ub.albiol.domain.model.Sensor;
+import com.ub.higiea.domain.model.Sensor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 

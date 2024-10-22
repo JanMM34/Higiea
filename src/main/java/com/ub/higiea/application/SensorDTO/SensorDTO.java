@@ -1,6 +1,6 @@
-package com.ub.albiol.application.SensorDTO;
+package com.ub.higiea.application.SensorDTO;
 
-import com.ub.albiol.domain.model.Sensor;
+import com.ub.higiea.domain.model.Sensor;
 import lombok.Data;
 
 import java.io.Serializable;

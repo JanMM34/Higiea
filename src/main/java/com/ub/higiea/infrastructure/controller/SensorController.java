@@ -1,7 +1,7 @@
-package com.ub.albiol.infrastructure.controller;
+package com.ub.higiea.infrastructure.controller;
 
-import com.ub.albiol.application.SensorDTO.SensorDTO;
-import com.ub.albiol.application.service.SensorService;
+import com.ub.higiea.application.SensorDTO.SensorDTO;
+import com.ub.higiea.application.service.SensorService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
