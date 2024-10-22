@@ -23,8 +23,8 @@ public class SensorController {
         return sensorService.getAllSensors();
     }
 
-    @GetMapping(params = "id", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<SensorDTO> getSensor(@RequestParam("id") String sensorId) {
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<SensorDTO> getSensor(@PathVariable("id") String sensorId) {
         // Returning an empty Flux for testing purposes
         return Flux.empty();
     }
