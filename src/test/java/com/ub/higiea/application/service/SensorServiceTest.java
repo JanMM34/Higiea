@@ -1,8 +1,8 @@
-package com.ub.albiol.application.service;
+package com.ub.higiea.application.service;
 
-import com.ub.albiol.application.SensorDTO.SensorDTO;
-import com.ub.albiol.domain.model.Sensor;
-import com.ub.albiol.domain.repository.SensorRepository;
+import com.ub.higiea.application.SensorDTO.SensorDTO;
+import com.ub.higiea.domain.model.Sensor;
+import com.ub.higiea.domain.repository.SensorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

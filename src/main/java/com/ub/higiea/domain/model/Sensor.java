@@ -1,4 +1,4 @@
-package com.ub.albiol.domain.model;
+package com.ub.higiea.domain.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;

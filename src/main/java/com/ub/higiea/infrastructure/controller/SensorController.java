@@ -1,7 +1,7 @@
-package com.ub.albiol.infrastructure.controller;
+package com.ub.higiea.infrastructure.controller;
 
-import com.ub.albiol.application.SensorDTO.SensorDTO;
-import com.ub.albiol.application.service.SensorService;
+import com.ub.higiea.application.SensorDTO.SensorDTO;
+import com.ub.higiea.application.service.SensorService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -23,8 +23,8 @@ public class SensorController {
         return sensorService.getAllSensors();
     }
 
-    @GetMapping(params = "id", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Flux<SensorDTO> getSensor(@RequestParam("id") String sensorId) {
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<SensorDTO> getSensor(@PathVariable("id") String sensorId) {
         // Returning an empty Flux for testing purposes
         return Flux.empty();
     }
