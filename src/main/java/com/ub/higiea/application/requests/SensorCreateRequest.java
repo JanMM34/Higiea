@@ -1,49 +1,35 @@
-package com.ub.higiea.domain.model;
+package com.ub.higiea.application.requests;
 
+import com.ub.higiea.domain.model.ContainerState;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
-@Table("sensor")
-public class Sensor {
+public class SensorCreateRequest {
 
-    @Id
-    @Column("id")
-    private Long id;
-
-    @NotNull
+    @NotNull(message = "Latitude cannot be null")
     @Min(-90)
     @Max(90)
-    @Column("latitude")
     private Double latitude;
 
-    @NotNull
+    @NotNull(message = "Longitude cannot be null")
     @Min(-180)
     @Max(180)
-    @Column("longitude")
     private Double longitude;
 
-    @Column("state")
+    @NotNull(message = "Container state cannot be null")
     private ContainerState containerState;
 
-    private Sensor() {
-    }
-
-    private Sensor(Double latitude, Double longitude, ContainerState containerState) {
+    private SensorCreateRequest(Double latitude, Double longitude, ContainerState containerState) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.containerState = containerState;
     }
 
-    public static Sensor create(Double latitude, Double longitude, ContainerState containerState) {
-        return new Sensor(latitude, longitude, containerState);
-    }
-
-    public Long getId() {
-        return id;
+    public static SensorCreateRequest toRequest(Double latitude, Double longitude, ContainerState containerState) {
+        return new SensorCreateRequest(latitude,longitude, containerState);
     }
 
     public Double getLatitude() {

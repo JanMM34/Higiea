@@ -1,40 +1,42 @@
-package com.ub.higiea.application.service;
+package com.ub.higiea.application.domainservice;
 
-import com.ub.higiea.application.DTOs.SensorDTO;
+import com.ub.higiea.application.dtos.SensorDTO;
+import com.ub.higiea.application.requests.SensorCreateRequest;
+import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 @Service
 public class SensorService {
+
     private final SensorRepository sensorRepository;
+
     public SensorService(SensorRepository sensorRepository) {
         this.sensorRepository = sensorRepository;
     }
 
     public Flux<SensorDTO> getAllSensors() {
         return sensorRepository.findAll()
-                .map(SensorDTO::toObject);
+                .map(SensorDTO::fromSensor);
     }
 
     public Mono<SensorDTO> getSensorById(Long id) {
         return sensorRepository.findById(id)
-                .map(SensorDTO::toObject);
+                .switchIfEmpty(Mono.error(new SensorNotFoundException(id)))
+                .map(SensorDTO::fromSensor);
     }
 
-    public Mono<SensorDTO> createSensor(SensorDTO sensorDTO) {
+    public Mono<SensorDTO> createSensor(SensorCreateRequest request) {
         Sensor sensor = Sensor.create(
-                sensorDTO.getId(),
-                sensorDTO.getLocation().getY(), // latitude
-                sensorDTO.getLocation().getX(), // longitude
-                sensorDTO.getContainerState()
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getContainerState()
         );
         return sensorRepository.save(sensor)
-                .map(SensorDTO::toObject);
+                .map(SensorDTO::fromSensor);
     }
 
 }

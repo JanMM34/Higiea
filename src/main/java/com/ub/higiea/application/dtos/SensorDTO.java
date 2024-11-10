@@ -1,4 +1,4 @@
-package com.ub.higiea.application.DTOs;
+package com.ub.higiea.application.dtos;
 
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.ContainerState;
@@ -8,11 +8,11 @@ import java.util.Objects;
 
 public class SensorDTO implements Serializable {
 
-    private Long id;
-    private Point location;
-    private ContainerState containerState;
+    final private Long id;
 
-    public SensorDTO() {}
+    final private Point location;
+
+    final private ContainerState containerState;
 
     private SensorDTO(Long id, Point location, ContainerState containerState) {
         this.id = id;
@@ -20,14 +20,10 @@ public class SensorDTO implements Serializable {
         this.containerState = containerState;
     }
 
-    public static SensorDTO fromData(Long id, Double latitude, Double longitude, ContainerState containerState) {
-        return new SensorDTO(id, new Point(longitude, latitude), containerState);
-    }
-
-    public static SensorDTO toObject(Sensor sensor) {
+    public static SensorDTO fromSensor(Sensor sensor) {
         return new SensorDTO(
                 sensor.getId(),
-                new Point(sensor.getLongitude(), sensor.getLatitude()),
+                new Point(sensor.getLatitude(),sensor.getLongitude()),
                 sensor.getContainerState()
         );
     }
