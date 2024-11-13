@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -24,13 +25,23 @@ public class RouteService {
     }
 
     public Mono<Route> createRoute(Truck truck, List<Sensor> sensors) {
-        List<Sensor> orderedSensors = routeCalculator.calculateRoute(sensors);
-        List<Long> sensorIds = orderedSensors.stream().map(Sensor::getId).toList();
+        return routeCalculator.calculateRoute(sensors) // Mono<List<Sensor>>
+                .flatMap(orderedSensors -> {
+                    List<Long> sensorIds = orderedSensors.stream()
+                            .map(Sensor::getId)
+                            .collect(Collectors.toList());
 
-        Double totalDistance = routeCalculator.calculateTotalDistance(orderedSensors);
-        Double estimatedTime = routeCalculator.calculateEstiamtedTime(orderedSensors);
+                    Mono<Double> totalDistanceMono = routeCalculator.calculateTotalDistance(orderedSensors);
+                    Mono<Double> estimatedTimeMono = routeCalculator.calculateEstimatedTime(orderedSensors);
 
-        Route route = Route.create(truck.getId(),sensorIds,totalDistance,estimatedTime);
-        return routeRepository.save(route);
+                    return Mono.zip(totalDistanceMono, estimatedTimeMono)
+                            .flatMap(tuple -> {
+                                Double totalDistance = tuple.getT1();
+                                Double estimatedTime = tuple.getT2();
+
+                                Route route = Route.create(truck.getId(), sensorIds, totalDistance, estimatedTime);
+                                return routeRepository.save(route);
+                            });
+                });
     }
 }
