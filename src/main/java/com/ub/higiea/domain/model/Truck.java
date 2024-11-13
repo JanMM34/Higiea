@@ -11,16 +11,11 @@ public class Truck {
     @Column("id")
     private Long id;
 
-    private Truck(){
-
+    private Truck() {
     }
 
-    private Truck(Long id) {
-        this.id = id;
-    }
-
-    public static Truck create(Long id) {
-        return new Truck(id);
+    public static Truck create() {
+        return new Truck();
     }
 
     public Long getId() {
