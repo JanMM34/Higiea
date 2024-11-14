@@ -3,6 +3,7 @@ package com.ub.higiea.application.domainservice;
 import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,8 @@ public class SensorService {
 
     public Mono<SensorDTO> createSensor(SensorCreateRequest request) {
         Sensor sensor = Sensor.create(
-                request.getLatitude(),
-                request.getLongitude(),
+                null,
+                Location.create(request.getLatitude(), request.getLongitude()),
                 request.getContainerState()
         );
         return sensorRepository.save(sensor)

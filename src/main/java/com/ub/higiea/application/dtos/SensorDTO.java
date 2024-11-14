@@ -23,7 +23,7 @@ public class SensorDTO implements Serializable {
     public static SensorDTO fromSensor(Sensor sensor) {
         return new SensorDTO(
                 sensor.getId(),
-                new Point(sensor.getLatitude(),sensor.getLongitude()),
+                new Point(sensor.getLocation().getLatitude(),sensor.getLocation().getLongitude()),
                 sensor.getContainerState()
         );
     }

@@ -1,7 +1,15 @@
 package com.ub.higiea.domain.repository;
 
 import com.ub.higiea.domain.model.Sensor;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public interface SensorRepository extends ReactiveCrudRepository<Sensor, Long> {
+public interface SensorRepository {
+
+    Mono<Sensor> findById(Long id);
+
+    Flux<Sensor> findAll();
+
+    Mono<Sensor> save(Sensor sensor);
+
 }

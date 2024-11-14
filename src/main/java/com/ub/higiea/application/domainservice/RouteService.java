@@ -25,12 +25,8 @@ public class RouteService {
     }
 
     public Mono<Route> createRoute(Truck truck, List<Sensor> sensors) {
-        return routeCalculator.calculateRoute(sensors) // Mono<List<Sensor>>
+        return routeCalculator.calculateRoute(sensors)
                 .flatMap(orderedSensors -> {
-                    List<Long> sensorIds = orderedSensors.stream()
-                            .map(Sensor::getId)
-                            .collect(Collectors.toList());
-
                     Mono<Double> totalDistanceMono = routeCalculator.calculateTotalDistance(orderedSensors);
                     Mono<Double> estimatedTimeMono = routeCalculator.calculateEstimatedTime(orderedSensors);
 
@@ -39,7 +35,7 @@ public class RouteService {
                                 Double totalDistance = tuple.getT1();
                                 Double estimatedTime = tuple.getT2();
 
-                                Route route = Route.create(truck.getId(), sensorIds, totalDistance, estimatedTime);
+                                Route route = Route.create(null, truck, orderedSensors, totalDistance, estimatedTime);
                                 return routeRepository.save(route);
                             });
                 });

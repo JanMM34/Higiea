@@ -5,6 +5,7 @@ import com.ub.higiea.application.domainservice.SensorService;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.ContainerState;
+import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,10 +30,8 @@ public class SensorControllerTest {
     @Test
     void getAllSensors_ShouldReturnListOfSensorDTOs() {
 
-        Sensor sensor1 = Sensor.create(10.0, 20.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor1, "id", 1L);
-        Sensor sensor2 = Sensor.create(10.0, 20.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor2, "id", 2L);
+        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
 
        SensorDTO sensorDTO1 = SensorDTO.fromSensor(sensor1);
        SensorDTO sensorDTO2 = SensorDTO.fromSensor(sensor2);
@@ -51,8 +50,7 @@ public class SensorControllerTest {
     @Test
     void getSensorById_ShouldReturnSensorDTO_WhenSensorExists() {
 
-        Sensor sensor = Sensor.create(10.0, 20.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor, "id", 1L);
+        Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
 
         SensorDTO expectedSensorDTO = SensorDTO.fromSensor(sensor);
 
@@ -75,8 +73,7 @@ public class SensorControllerTest {
                 20.0,
                 ContainerState.EMPTY
         );
-        Sensor sensor = Sensor.create(10.0, 20.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor, "id", 1L);
+        Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
         SensorDTO sensorDTO = SensorDTO.fromSensor(sensor);
 
         Mockito.when(sensorService.createSensor(Mockito.argThat(request ->
