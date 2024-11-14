@@ -1,17 +1,17 @@
 package com.ub.higiea.application.dtos;
 
 import com.ub.higiea.domain.model.Truck;
-import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class TruckDTO implements Serializable {
 
+    private Long id;
 
-    private final Long id;
+    public TruckDTO() {
+    }
 
-    public TruckDTO(Long id) {
+    private TruckDTO(Long id) {
         this.id = id;
     }
 

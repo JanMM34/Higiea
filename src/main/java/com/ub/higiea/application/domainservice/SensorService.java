@@ -2,7 +2,7 @@ package com.ub.higiea.application.domainservice;
 
 import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
-import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;

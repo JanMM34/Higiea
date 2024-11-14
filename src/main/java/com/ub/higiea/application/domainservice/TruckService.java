@@ -1,6 +1,7 @@
 package com.ub.higiea.application.domainservice;
 
 import com.ub.higiea.application.dtos.TruckDTO;
+import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
 import com.ub.higiea.domain.model.Truck;
 import com.ub.higiea.domain.repository.TruckRepository;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,11 @@ public class TruckService {
 
     public Mono<TruckDTO> getTruckById(Long id) {
         return truckRepository.findById(id)
+                .switchIfEmpty(Mono.error(new TruckNotFoundException(id)))
                 .map(TruckDTO::fromTruck);
     }
 
-    public Mono<TruckDTO> createTruck(TruckDTO truckDTO) {
+    public Mono<TruckDTO> createTruck() {
         Truck truck = Truck.create(null);
         return truckRepository.save(truck)
                 .map(TruckDTO::fromTruck);
