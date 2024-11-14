@@ -8,11 +8,11 @@ import java.util.Objects;
 
 public class SensorDTO implements Serializable {
 
-    final private Long id;
+    private final Long id;
 
-    final private Point location;
+    private final Point location;
 
-    final private ContainerState containerState;
+    private final ContainerState containerState;
 
     private SensorDTO(Long id, Point location, ContainerState containerState) {
         this.id = id;

@@ -1,4 +1,4 @@
-package com.ub.higiea.domain.exception.notfound;
+package com.ub.higiea.application.exception.notfound;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

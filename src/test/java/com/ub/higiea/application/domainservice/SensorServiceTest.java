@@ -2,7 +2,7 @@ package com.ub.higiea.application.domainservice;
 
 import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
-import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
@@ -10,8 +10,6 @@ import com.ub.higiea.domain.repository.SensorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Any;
-import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
