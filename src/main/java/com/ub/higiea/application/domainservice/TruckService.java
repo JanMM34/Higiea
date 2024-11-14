@@ -25,7 +25,7 @@ public class TruckService {
     }
 
     public Mono<TruckDTO> createTruck(TruckDTO truckDTO) {
-        Truck truck = Truck.create();
+        Truck truck = Truck.create(null);
         return truckRepository.save(truck)
                 .map(TruckDTO::fromTruck);
     }

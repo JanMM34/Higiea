@@ -4,6 +4,7 @@ import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.ContainerState;
+import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,8 +29,8 @@ public class SensorServiceTest {
 
     @Test
     void getAllSensors_ShouldReturnAllSensorsDTOs_WhenRepositoryNotEmpty() {
-        Sensor sensor1 = Sensor.create(20.0, 10.0, ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(25.0, 15.0, ContainerState.FULL);
+        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 20.0), ContainerState.FULL);
 
         SensorDTO expectedSensor1DTO = SensorDTO.fromSensor(sensor1);
         SensorDTO expectedSensor2DTO = SensorDTO.fromSensor(sensor2);
@@ -37,8 +38,8 @@ public class SensorServiceTest {
         Mockito.when(sensorRepository.findAll()).thenReturn(Flux.just(sensor1, sensor2));
 
         StepVerifier.create(sensorService.getAllSensors())
-                .expectNextMatches(dto -> dto.equals(expectedSensor1DTO))  // Check properties of first SensorDTO
-                .expectNextMatches(dto -> dto.equals(expectedSensor2DTO))  // Check properties of second SensorDTO
+                .expectNextMatches(dto -> dto.equals(expectedSensor1DTO))
+                .expectNextMatches(dto -> dto.equals(expectedSensor2DTO))
                 .verifyComplete();
     }
 
@@ -52,14 +53,13 @@ public class SensorServiceTest {
 
     @Test
     void getSensorById_shouldReturnSensorDTO_WhenSensorFound() {
-        Sensor sensor = Sensor.create(20.0, 10.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor, "id", 1L);
+        Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
         SensorDTO expectedSensorDTO = SensorDTO.fromSensor(sensor);
 
         Mockito.when(sensorRepository.findById(sensor.getId())).thenReturn(Mono.just(sensor));
 
         StepVerifier.create(sensorService.getSensorById(sensor.getId()))
-                .expectNextMatches(dto -> dto.equals(expectedSensorDTO))  // Verify properties of SensorDTO
+                .expectNextMatches(dto -> dto.equals(expectedSensorDTO))
                 .verifyComplete();
     }
 
@@ -79,8 +79,7 @@ public class SensorServiceTest {
                 10.0, 20.0,
                 ContainerState.EMPTY
         );
-        Sensor sensor = Sensor.create(10.0, 20.0, ContainerState.EMPTY);
-        ReflectionTestUtils.setField(sensor, "id", 1L); // Set ID for testing
+        Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
 
         SensorDTO expectedSensorDTO = SensorDTO.fromSensor(sensor);
 
