@@ -58,4 +58,5 @@ public class RouteEntity {
     public Double getEstimatedTime() {
         return estimatedTime;
     }
+
 }

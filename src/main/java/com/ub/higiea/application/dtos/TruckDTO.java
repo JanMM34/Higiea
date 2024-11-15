@@ -9,7 +9,11 @@ import java.util.Objects;
 public class TruckDTO implements Serializable {
 
 
-    private final Long id;
+    private Long id;
+
+    public TruckDTO(){
+
+    }
 
     public TruckDTO(Long id) {
         this.id = id;
