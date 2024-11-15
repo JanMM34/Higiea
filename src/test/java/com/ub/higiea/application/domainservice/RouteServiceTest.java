@@ -1,8 +1,12 @@
 package com.ub.higiea.application.domainservice;
 
+import com.ub.higiea.application.dtos.RouteDTO;
+import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.domain.model.*;
 import com.ub.higiea.domain.repository.RouteRepository;
+import com.ub.higiea.domain.repository.SensorRepository;
+import com.ub.higiea.domain.repository.TruckRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,43 +20,52 @@ public class RouteServiceTest {
     private RouteService routeService;
     private RouteCalculator routeCalculator;
     private RouteRepository routeRepository;
+    private TruckRepository truckRepository;
+    private SensorRepository sensorRepository;
 
     @BeforeEach
     public void setUp() {
         routeCalculator = Mockito.mock(RouteCalculator.class);
         routeRepository = Mockito.mock(RouteRepository.class);
-        routeService = new RouteService(routeCalculator, routeRepository);
+        truckRepository = Mockito.mock(TruckRepository.class);
+        sensorRepository = Mockito.mock(SensorRepository.class);
+        routeService = new RouteService(routeCalculator, routeRepository,truckRepository,sensorRepository);
     }
 
     @Test
-    void createRoute_shouldSaveRoute_WhenValidInput() {
+    void createRoute_shouldReturnRouteDTO_WhenValidInput() {
 
-        Truck truck = Truck.create(1L);
+        Long truckId = 1L;
+        List<Long> sensorIds = List.of(1L, 2L);
 
-        Sensor sensor1 = Sensor.create(1L,Location.create(20.0,15.0), ContainerState.FULL);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0,15.0), ContainerState.FULL);
+        RouteCreateRequest request = RouteCreateRequest.toRequest(truckId, sensorIds);
 
-        List<Sensor> sensors = List.of(sensor1,sensor2);
-        List<Sensor> orderedSensors = List.of(sensor1,sensor2);
+        Truck truck = Truck.create(truckId);
+        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 20.0), ContainerState.FULL);
+        List<Sensor> sensors = List.of(sensor1, sensor2);
+        List<Sensor> orderedSensors = List.of(sensor1, sensor2);
+
+        Mockito.when(truckRepository.findById(truckId)).thenReturn(Mono.just(truck));
+        Mockito.when(sensorRepository.findById(1L)).thenReturn(Mono.just(sensor1));
+        Mockito.when(sensorRepository.findById(2L)).thenReturn(Mono.just(sensor2));
 
         Mockito.when(routeCalculator.calculateRoute(sensors)).thenReturn(Mono.just(orderedSensors));
         Mockito.when(routeCalculator.calculateTotalDistance(orderedSensors)).thenReturn(Mono.just(30.0));
         Mockito.when(routeCalculator.calculateEstimatedTime(orderedSensors)).thenReturn(Mono.just(45.0));
 
-        Route expectedRoute = Route.create("1",truck, List.of(sensor1, sensor2), 30.0, 45.0);
-        Mockito.when(routeRepository.save(Mockito.any(Route.class))).thenReturn(Mono.just(expectedRoute));
+        Route route = Route.create(null, truck, orderedSensors, 30.0, 45.0);
+        RouteDTO expectedRouteDTO = RouteDTO.fromRoute(route);
 
-        Mono<Route> result = routeService.createRoute(truck, sensors);
-        StepVerifier.create(result)
-                .expectNextMatches(route ->
-                        route.getTruck().equals(truck) &&
-                                route.getSensors().equals(List.of(sensor1, sensor2)) &&
-                                route.getTotalDistance().equals(30.0) &&
-                                route.getEstimatedTime().equals(45.0)
-                )
+        Mockito.when(routeRepository.save(Mockito.any(Route.class))).thenReturn(Mono.just(route));
+
+        StepVerifier.create(routeService.createRoute(request))
+                .expectNextMatches(dto -> dto.equals(expectedRouteDTO))
                 .verifyComplete();
 
-
+        Mockito.verify(truckRepository).findById(truckId);
+        Mockito.verify(sensorRepository).findById(1L);
+        Mockito.verify(sensorRepository).findById(2L);
         Mockito.verify(routeCalculator).calculateRoute(sensors);
         Mockito.verify(routeCalculator).calculateTotalDistance(orderedSensors);
         Mockito.verify(routeCalculator).calculateEstimatedTime(orderedSensors);
