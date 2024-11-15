@@ -1,11 +1,12 @@
 package com.ub.higiea.application.domainservice;
 
+import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.application.dtos.RouteDTO;
-import com.ub.higiea.domain.exception.notfound.NotFoundException;
-import com.ub.higiea.domain.exception.notfound.SensorNotFoundException;
-import com.ub.higiea.domain.exception.notfound.TruckNotFoundException;
+import com.ub.higiea.application.exception.notfound.NotFoundException;
+import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
 import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.Truck;
@@ -77,4 +78,9 @@ public class RouteService {
                 .flatMap(routeRepository::save);
     }
 
+    public Mono<RouteDTO> getRouteById(String routeId) {
+        return routeRepository.findById(routeId)
+                .switchIfEmpty(Mono.error(new RouteNotFoundException(routeId)))
+                .map(RouteDTO::fromRoute);
+    }
 }

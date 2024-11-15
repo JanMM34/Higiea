@@ -1,10 +1,14 @@
 package com.ub.higiea.application.requests;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 public class RouteCreateRequest {
 
+    @NotNull(message = "Truck cannot be null")
     private final Long truckId;
+    @NotNull(message = "Sensors cannot be null")
     private final List<Long> sensorIds;
 
     public RouteCreateRequest(Long truckId, List<Long> sensorIds) {
