@@ -38,7 +38,7 @@ public class TruckController {
                         new ResponseStatusException(HttpStatus.NOT_FOUND,ex.getMessage(),ex));
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<TruckDTO> createTruck() {
         return truckService.createTruck()
                 .onErrorMap(ValidationException.class, ex -> new ResponseStatusException(HttpStatus.BAD_REQUEST,

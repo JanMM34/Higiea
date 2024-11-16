@@ -39,7 +39,8 @@ public class RouteService {
     }
 
     public Flux<RouteDTO> getAllRoutes() {
-        return null;
+        return routeRepository.findAll()
+                .map(RouteDTO::fromRoute);
     }
 
     public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
