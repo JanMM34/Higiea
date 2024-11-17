@@ -33,8 +33,8 @@ public class RouteControllerTest {
         Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
         Truck truck = Truck.create(1L);
 
-        Route route1 = Route.create("1", truck, List.of(sensor1,sensor2),100.0,50.0);
-        Route route2 = Route.create("2", truck, List.of(sensor2,sensor1),500.0,100.0);
+        Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
+        Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 500.0, 100L, List.of(Location.create(30.0, 60.0), Location.create(20.0, 10.0)));
         RouteDTO routeDTO1 = RouteDTO.fromRoute(route1);
         RouteDTO routeDTO2 = RouteDTO.fromRoute(route2);
 
@@ -57,14 +57,14 @@ public class RouteControllerTest {
         Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
         Truck truck = Truck.create(1L);
 
-        Route route = Route.create("1", truck, List.of(sensor1,sensor2),100.0,50.0);
+        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
         RouteDTO expectedRouteDTO = RouteDTO.fromRoute(route);
 
         String routeId = "1";
         Mockito.when(routeService.getRouteById(routeId)).thenReturn(Mono.just(expectedRouteDTO));
 
         webTestClient.get()
-                .uri("/routes/{id}",routeId)
+                .uri("/routes/{id}", routeId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -83,7 +83,7 @@ public class RouteControllerTest {
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
         Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
         Truck truck = Truck.create(1L);
-        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50.0);
+        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
         RouteDTO routeDTO = RouteDTO.fromRoute(route);
 
         Mockito.when(routeService.createRoute(Mockito.argThat(request ->
@@ -103,18 +103,17 @@ public class RouteControllerTest {
     }
 
     @Test
-    void getRouteById_ShouldReturnNotFound_WhenRouteDoesNotExists(){
+    void getRouteById_ShouldReturnNotFound_WhenRouteDoesNotExists() {
         String routeId = "1";
         Mockito.when(routeService.getRouteById(routeId)).thenReturn(Mono.error(new RouteNotFoundException(routeId)));
 
         webTestClient.get()
-                .uri("/routes/{id}",routeId)
+                .uri("/routes/{id}", routeId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.message").isEqualTo("Route with id 1 not found");
-
     }
 
     @Test

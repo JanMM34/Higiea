@@ -2,6 +2,7 @@ package com.ub.higiea.infrastructure.persistence.entities;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
@@ -22,17 +23,21 @@ public class RouteEntity {
     private Double totalDistance;
 
     @Field("estimated_time")
-    private Double estimatedTime;
+    private Long estimatedTimeInSeconds;
+
+    @Field("route_geometry")
+    private List<Point> routeGeometry;
 
     public RouteEntity() {
     }
 
-    public RouteEntity(ObjectId id, Long truckId, List<Long> sensorIds, Double totalDistance, Double estimatedTime) {
+    public RouteEntity(ObjectId id, Long truckId, List<Long> sensorIds, Double totalDistance, Long estimatedTimeInSeconds, List<Point> routeGeometry) {
         this.id = id;
         this.truckId = truckId;
         this.sensorIds = sensorIds;
         this.totalDistance = totalDistance;
-        this.estimatedTime = estimatedTime;
+        this.estimatedTimeInSeconds = estimatedTimeInSeconds;
+        this.routeGeometry = routeGeometry;
     }
 
     public ObjectId getId() {
@@ -55,8 +60,12 @@ public class RouteEntity {
         return totalDistance;
     }
 
-    public Double getEstimatedTime() {
-        return estimatedTime;
+    public Long getEstimatedTimeInSeconds() {
+        return estimatedTimeInSeconds;
+    }
+
+    public List<Point> getRouteGeometry() {
+        return routeGeometry;
     }
 
 }

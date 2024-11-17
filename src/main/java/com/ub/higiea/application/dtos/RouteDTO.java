@@ -1,6 +1,7 @@
 package com.ub.higiea.application.dtos;
 
 import com.ub.higiea.domain.model.Route;
+import org.springframework.data.geo.Point;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,14 +13,16 @@ public class RouteDTO implements Serializable {
     private final TruckDTO truck;
     private final List<SensorDTO> sensors;
     private final Double totalDistance;
-    private final Double estimatedTime;
+    private final Long estimatedTime;
+    private final List<Point> routeGeometry;
 
-    private RouteDTO(String id, TruckDTO truck, List<SensorDTO> sensors, Double totalDistance, Double estimatedTime) {
+    private RouteDTO(String id, TruckDTO truck, List<SensorDTO> sensors, Double totalDistance, Long estimatedTime, List<Point> routeGeometry) {
         this.id = id;
         this.truck = truck;
         this.sensors = sensors;
         this.totalDistance = totalDistance;
         this.estimatedTime = estimatedTime;
+        this.routeGeometry = routeGeometry;
     }
 
     public static RouteDTO fromRoute(Route route) {
@@ -28,7 +31,11 @@ public class RouteDTO implements Serializable {
                 TruckDTO.fromTruck(route.getTruck()),
                 route.getSensors().stream().map(SensorDTO::fromSensor).toList(),
                 route.getTotalDistance(),
-                route.getEstimatedTime()
+                route.getEstimatedTimeInSeconds(),
+                route.getRouteGeometry().stream()
+                        .map(location ->
+                                new Point(location.getLongitude(), location.getLatitude())
+                        ).toList()
         );
     }
 
@@ -48,8 +55,12 @@ public class RouteDTO implements Serializable {
         return totalDistance;
     }
 
-    public Double getEstimatedTime() {
+    public Long getEstimatedTime() {
         return estimatedTime;
+    }
+
+    public List<Point> getRouteGeometry() {
+        return routeGeometry;
     }
 
     @Override
