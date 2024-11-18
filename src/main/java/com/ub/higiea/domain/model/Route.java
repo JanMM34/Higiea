@@ -12,21 +12,24 @@ public class Route {
 
     private Double totalDistance;
 
-    private Double estimatedTime;
+    private Long estimatedTimeInSeconds;
+
+    private List<Location> routeGeometry;
 
     private Route() {
     }
 
-    private Route(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Double estimatedTime) {
+    private Route(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime, List<Location> routeGeometry) {
         this.id = id;
         this.truck = truck;
         this.sensors = sensors;
         this.totalDistance = totalDistance;
-        this.estimatedTime = estimatedTime;
+        this.estimatedTimeInSeconds = estimatedTime;
+        this.routeGeometry = routeGeometry;
     }
 
-    public static Route create(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Double estimatedTime) {
-        return new Route(id, truck, sensors, totalDistance, estimatedTime);
+    public static Route create(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime, List<Location> routeGeometry) {
+        return new Route(id, truck, sensors, totalDistance, estimatedTime, routeGeometry);
     }
 
     public String getId() {
@@ -45,8 +48,12 @@ public class Route {
         return totalDistance;
     }
 
-    public Double getEstimatedTime() {
-        return estimatedTime;
+    public Long getEstimatedTimeInSeconds() {
+        return estimatedTimeInSeconds;
+    }
+
+    public List<Location> getRouteGeometry() {
+        return routeGeometry;
     }
 
 }

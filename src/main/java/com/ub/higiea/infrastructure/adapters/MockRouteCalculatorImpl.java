@@ -1,6 +1,8 @@
 package com.ub.higiea.infrastructure.adapters;
 
+import com.ub.higiea.application.utils.RouteCalculationResult;
 import com.ub.higiea.application.utils.RouteCalculator;
+import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -13,21 +15,28 @@ import java.util.stream.Collectors;
 public class MockRouteCalculatorImpl implements RouteCalculator {
 
     @Override
-    public Mono<List<Sensor>> calculateRoute(List<Sensor> sensors) {
-        return Mono.just(
-                sensors.stream()
-                        .sorted(Comparator.comparingLong(Sensor::getId))
-                        .collect(Collectors.toList())
+    public Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors) {
+
+        List<Sensor> orderedSensors = sensors.stream()
+                .sorted(Comparator.comparingLong(Sensor::getId))
+                .collect(Collectors.toList());
+
+
+        double totalDistance = 10.0;
+        long estimatedTimeInSeconds = 30L;
+
+
+        List<Location> routeGeometry = orderedSensors.stream()
+                .map(Sensor::getLocation)
+                .toList();
+
+        RouteCalculationResult result = new RouteCalculationResult(
+                orderedSensors,
+                totalDistance,
+                estimatedTimeInSeconds,
+                routeGeometry
         );
-    }
 
-    @Override
-    public Mono<Double> calculateTotalDistance(List<Sensor> sensors) {
-        return Mono.just(10.0);
-    }
-
-    @Override
-    public Mono<Double> calculateEstimatedTime(List<Sensor> sensors) {
-        return Mono.just(30.0);
+        return Mono.just(result);
     }
 }

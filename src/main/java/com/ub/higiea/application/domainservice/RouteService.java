@@ -43,6 +43,12 @@ public class RouteService {
                 .map(RouteDTO::fromRoute);
     }
 
+    public Mono<RouteDTO> getRouteById(String routeId) {
+        return routeRepository.findById(routeId)
+                .switchIfEmpty(Mono.error(new RouteNotFoundException(routeId)))
+                .map(RouteDTO::fromRoute);
+    }
+
     public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
         return Mono.zip(
                         fetchTruck(request.getTruckId()),
@@ -54,7 +60,7 @@ public class RouteService {
 
     private Mono<Truck> fetchTruck(Long truckId) {
         return truckRepository.findById(truckId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Truck not found with ID: " + truckId)));
+                .switchIfEmpty(Mono.error(new TruckNotFoundException(truckId)));
     }
 
     private Mono<List<Sensor>> fetchSensors(List<Long> sensorIds) {
@@ -71,17 +77,17 @@ public class RouteService {
 
     private Mono<Route> calculateAndSaveRoute(Truck truck, List<Sensor> sensors) {
         return routeCalculator.calculateRoute(sensors)
-                .flatMap(orderedSensors -> Mono.zip(
-                        routeCalculator.calculateTotalDistance(orderedSensors),
-                        routeCalculator.calculateEstimatedTime(orderedSensors),
-                        (totalDistance, estimatedTime) -> Route.create(null, truck, orderedSensors, totalDistance, estimatedTime)
-                ))
-                .flatMap(routeRepository::save);
+                .flatMap(result -> {
+                    Route route = Route.create(
+                            null,
+                            truck,
+                            result.getOrderedSensors(),
+                            result.getTotalDistance(),
+                            result.getEstimatedTimeInSeconds(),
+                            result.getRouteGeometry()
+                    );
+                    return routeRepository.save(route);
+                });
     }
 
-    public Mono<RouteDTO> getRouteById(String routeId) {
-        return routeRepository.findById(routeId)
-                .switchIfEmpty(Mono.error(new RouteNotFoundException(routeId)))
-                .map(RouteDTO::fromRoute);
-    }
 }

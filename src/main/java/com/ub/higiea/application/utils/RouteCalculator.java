@@ -7,10 +7,6 @@ import java.util.List;
 
 public interface RouteCalculator {
 
-    Mono<List<Sensor>> calculateRoute(List<Sensor> sensors);
-
-    Mono<Double> calculateTotalDistance(List<Sensor> sensors);
-
-    Mono<Double> calculateEstimatedTime(List<Sensor> sensors);
+    Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors);
 
 }
