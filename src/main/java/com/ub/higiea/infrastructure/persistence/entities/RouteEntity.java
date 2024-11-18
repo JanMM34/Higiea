@@ -2,10 +2,9 @@ package com.ub.higiea.infrastructure.persistence.entities;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
+import java.util.Map;
 
 @Document("route")
 public class RouteEntity {
@@ -13,31 +12,16 @@ public class RouteEntity {
     @Id
     private ObjectId id;
 
-    @Field("truck_id")
-    private Long truckId;
-
-    @Field("sensor_ids")
-    private List<Long> sensorIds;
-
-    @Field("distance")
-    private Double totalDistance;
-
-    @Field("estimated_time")
-    private Long estimatedTimeInSeconds;
-
-    @Field("route_geometry")
-    private List<Point> routeGeometry;
+    private String type; // "FeatureCollection"
+    private List<Map<String, Object>> features; // Each element is a GeoJSON feature
 
     public RouteEntity() {
     }
 
-    public RouteEntity(ObjectId id, Long truckId, List<Long> sensorIds, Double totalDistance, Long estimatedTimeInSeconds, List<Point> routeGeometry) {
+    public RouteEntity(ObjectId id, String type, List<Map<String, Object>> features) {
         this.id = id;
-        this.truckId = truckId;
-        this.sensorIds = sensorIds;
-        this.totalDistance = totalDistance;
-        this.estimatedTimeInSeconds = estimatedTimeInSeconds;
-        this.routeGeometry = routeGeometry;
+        this.type = type;
+        this.features = features;
     }
 
     public ObjectId getId() {
@@ -48,24 +32,19 @@ public class RouteEntity {
         this.id = id;
     }
 
-    public Long getTruckId() {
-        return truckId;
+    public String getType() {
+        return type;
     }
 
-    public List<Long> getSensorIds() {
-        return sensorIds;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Double getTotalDistance() {
-        return totalDistance;
+    public List<Map<String, Object>> getFeatures() {
+        return features;
     }
 
-    public Long getEstimatedTimeInSeconds() {
-        return estimatedTimeInSeconds;
+    public void setFeatures(List<Map<String, Object>> features) {
+        this.features = features;
     }
-
-    public List<Point> getRouteGeometry() {
-        return routeGeometry;
-    }
-
 }
