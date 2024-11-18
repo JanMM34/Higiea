@@ -1,7 +1,7 @@
 package com.ub.higiea.infrastructure.adapters.azuremaps;
 
-import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.models.GeoPosition;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.maps.route.MapsRouteAsyncClient;
 import com.azure.maps.route.MapsRouteClientBuilder;
 import com.azure.maps.route.models.*;
@@ -10,37 +10,35 @@ import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import reactor.core.publisher.Mono;
-
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class AzureMapsRouteCalculator implements RouteCalculator {
 
     private final MapsRouteAsyncClient mapsRouteClient;
 
-    public AzureMapsRouteCalculator(String azureMapsSubscriptionKey) {
-
-        AzureKeyCredential credential = new AzureKeyCredential(azureMapsSubscriptionKey);
-
-        MapsRouteClientBuilder builder = new MapsRouteClientBuilder()
-                .credential(credential);
-
-        this.mapsRouteClient = builder.buildAsyncClient();
+    public AzureMapsRouteCalculator(MapsRouteAsyncClient mapsRouteClient) {
+        this.mapsRouteClient = mapsRouteClient;
     }
 
     @Override
     public Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors) {
         return calculateOptimizedRoute(sensors)
                 .map(routeDirections -> {
-
+                    List<Sensor> orderedSensors = new ArrayList<>(sensors);
+                    // Extract optimized waypoints
                     List<RouteOptimizedWaypoint> optimizedWaypoints = routeDirections.getOptimizedWaypoints();
 
-                    List<Sensor> orderedSensors = optimizedWaypoints.stream()
-                            .sorted(Comparator.comparingInt(RouteOptimizedWaypoint::getOptimizedIndex))
-                            .map(waypoint -> sensors.get(waypoint.getProvidedIndex()))
-                            .collect(Collectors.toList());
+                    // Iterate over optimized waypoints and place them in the correct order
+                    for (RouteOptimizedWaypoint waypoint : optimizedWaypoints) {
+                        int providedIndex = waypoint.getProvidedIndex();
+                        int optimizedIndex = waypoint.getOptimizedIndex();
+
+                        // Move the sensor from the provided index to the new optimized index
+                        Sensor sensorToMove = sensors.get(providedIndex);
+                        orderedSensors.set(optimizedIndex, sensorToMove);
+                    }
 
                     Double totalDistance = routeDirections.getRoutes().getFirst().getSummary()
                             .getLengthInMeters().doubleValue();
@@ -55,7 +53,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
 
                     List<Location> routeGeometry = routeGeometryPoints.stream()
                             .map(geoPosition -> Location.create(geoPosition.getLatitude(), geoPosition.getLongitude()))
-                            .collect(Collectors.toList());
+                            .toList();
 
                     return new RouteCalculationResult(orderedSensors, totalDistance, estimatedTimeInSeconds, routeGeometry);
                 });
@@ -66,11 +64,11 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                 .map(sensor -> new GeoPosition(
                         sensor.getLocation().getLongitude(),
                         sensor.getLocation().getLatitude()))
-                .collect(Collectors.toList());
+                .toList();
 
         RouteDirectionsOptions options = new RouteDirectionsOptions(coordinates)
                 .setComputeBestWaypointOrder(true)
-                .setRouteType(RouteType.ECONOMY);
+                .setRouteType(RouteType.FASTEST);
 
         return mapsRouteClient.getRouteDirections(options)
                 .flatMap(response -> {
@@ -80,4 +78,5 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                     return Mono.just(response);
                 });
     }
+
 }

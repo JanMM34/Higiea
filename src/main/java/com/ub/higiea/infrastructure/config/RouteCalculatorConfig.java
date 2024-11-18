@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.config;
 
+import com.azure.maps.route.MapsRouteAsyncClient;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.infrastructure.adapters.azuremaps.AzureMapsRouteCalculator;
 import com.ub.higiea.infrastructure.adapters.MockRouteCalculatorImpl;
@@ -13,14 +14,17 @@ public class RouteCalculatorConfig {
     @Value("${route.calculator.type:mock}")
     private String calculatorType;
 
-    @Value("${AZURE_MAPS_SUBSCRIPTION_KEY:}")
-    private String azureMapsSubscriptionKey;
+    private final MapsRouteAsyncClient mapsRouteAsyncClient;
+
+    public RouteCalculatorConfig(MapsRouteAsyncClient mapsRouteAsyncClient) {
+        this.mapsRouteAsyncClient = mapsRouteAsyncClient;
+    }
 
     @Bean
     public RouteCalculator routeCalculator() {
         switch (calculatorType) {
             case "azure":
-                return new AzureMapsRouteCalculator(azureMapsSubscriptionKey);
+                return new AzureMapsRouteCalculator(mapsRouteAsyncClient);
             case "mock":
             default:
                 return new MockRouteCalculatorImpl();

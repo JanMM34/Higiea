@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 	implementation 'com.azure:azure-maps-route:1.0.0-beta.1'
+	implementation 'com.azure:azure-identity:1.14.2'
 	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'org.postgresql:r2dbc-postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
