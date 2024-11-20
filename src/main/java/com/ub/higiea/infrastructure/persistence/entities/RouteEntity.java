@@ -1,71 +1,109 @@
 package com.ub.higiea.infrastructure.persistence.entities;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import java.util.List;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.geo.GeoJsonLineString;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 
-@Document("route")
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+@Document(collection = "routes")
 public class RouteEntity {
 
     @Id
-    private ObjectId id;
+    private String id;
 
-    @Field("truck_id")
     private Long truckId;
 
-    @Field("sensor_ids")
-    private List<Long> sensorIds;
+    private String type = "FeatureCollection";
 
-    @Field("distance")
-    private Double totalDistance;
+    private List<Feature> features;
 
-    @Field("estimated_time")
-    private Long estimatedTimeInSeconds;
-
-    @Field("route_geometry")
-    private List<Point> routeGeometry;
-
-    public RouteEntity() {
-    }
-
-    public RouteEntity(ObjectId id, Long truckId, List<Long> sensorIds, Double totalDistance, Long estimatedTimeInSeconds, List<Point> routeGeometry) {
+    public RouteEntity(String id, Long truckId, List<Feature> features) {
         this.id = id;
+        this.features = features;
         this.truckId = truckId;
-        this.sensorIds = sensorIds;
-        this.totalDistance = totalDistance;
-        this.estimatedTimeInSeconds = estimatedTimeInSeconds;
-        this.routeGeometry = routeGeometry;
     }
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
+    public String getId() {
+        return this.id;
     }
 
     public Long getTruckId() {
-        return truckId;
+        return this.truckId;
     }
 
-    public List<Long> getSensorIds() {
-        return sensorIds;
+    public List<Feature> getFeatures() {
+        return features;
     }
 
-    public Double getTotalDistance() {
-        return totalDistance;
+    public static abstract class Feature {
+        private final String type = "Feature";
+        private final Map<String, Object> properties = new HashMap<>();
+        private final GeoJson geometry;
+
+        protected Feature(Map<String, Object> properties, GeoJson geometry) {
+            if (properties != null) {
+                this.properties.putAll(properties);
+            }
+            this.geometry = geometry;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public Map<String, Object> getProperties() {
+            return properties;
+        }
+
+        public GeoJson getGeometry() {
+            return geometry;
+        }
+
     }
 
-    public Long getEstimatedTimeInSeconds() {
-        return estimatedTimeInSeconds;
+    public static class SensorFeature extends Feature {
+
+        @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+        private final GeoJsonPoint location;
+
+        public SensorFeature(Long id, String containerState, GeoJsonPoint location) {
+            super(Map.of(
+                    "id", id,
+                    "containerState", containerState
+            ), location);
+            this.location = location;
+        }
+
+        public GeoJsonPoint getLocation() {
+            return location;
+        }
+
     }
 
-    public List<Point> getRouteGeometry() {
-        return routeGeometry;
+    public static class RouteFeature extends Feature {
+
+        @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+        private final GeoJsonLineString routeGeometry;
+
+        public RouteFeature(Double totalDistance, Long estimatedTime, GeoJsonLineString routeGeometry) {
+            super(Map.of(
+                    "totalDistance", totalDistance,
+                    "estimatedTime", estimatedTime
+            ), routeGeometry);
+            this.routeGeometry = routeGeometry;
+        }
+
+        public GeoJsonLineString getRouteGeometry() {
+            return routeGeometry;
+        }
+
     }
 
 }
