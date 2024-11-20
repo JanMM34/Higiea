@@ -1,72 +1,91 @@
 package com.ub.higiea.infrastructure.persistence.mapper;
 
-import org.bson.Document;
+import com.ub.higiea.domain.model.*;
+import com.ub.higiea.infrastructure.persistence.entities.RouteEntity;
 import org.springframework.data.mongodb.core.geo.GeoJsonLineString;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
-import com.ub.higiea.domain.model.Location;
-import com.ub.higiea.domain.model.Route;
-import com.ub.higiea.domain.model.Sensor;
-import com.ub.higiea.domain.model.Truck;
-import com.ub.higiea.infrastructure.persistence.entities.RouteEntity;
-import org.bson.types.ObjectId;
 import org.springframework.data.geo.Point;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class RouteMapper {
 
     public static RouteEntity toEntity(Route route) {
-        List<Map<String, Object>> features = new ArrayList<>();
 
-        for (Sensor sensor : route.getSensors()) {
-            Map<String, Object> sensorFeature = new HashMap<>();
-            sensorFeature.put("type", "Feature");
+        String routeId = (route.getId() != null && !route.getId().isEmpty()) ? route.getId()
+                : UUID.randomUUID().toString();
+        Long truckId = route.getTruck().getId();
 
-            Map<String, Object> geometry = new HashMap<>();
-            geometry.put("type", "Point");
-            geometry.put("coordinates", List.of(
-                    sensor.getLocation().getLongitude(),
-                    sensor.getLocation().getLatitude()
-            ));
-            sensorFeature.put("geometry", geometry);
+        GeoJsonLineString routeGeometry = new GeoJsonLineString(
+                route.getRouteGeometry().stream()
+                        .map(location -> new Point(location.getLongitude(), location.getLatitude()))
+                        .toList()
+        );
 
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("type", "Sensor");
-            properties.put("id", sensor.getId());
-            properties.put("containerState", sensor.getContainerState().toString());
-            sensorFeature.put("properties", properties);
+        RouteEntity.RouteFeature routeFeature = new RouteEntity.RouteFeature(
+                route.getTotalDistance(),
+                route.getEstimatedTimeInSeconds(),
+                routeGeometry
+        );
 
-            features.add(sensorFeature);
+        List<RouteEntity.SensorFeature> sensorFeatures = route.getSensors().stream()
+                .map(sensor -> new RouteEntity.SensorFeature(
+                        sensor.getId(),
+                        sensor.getContainerState().name(),
+                        new GeoJsonPoint(sensor.getLocation().getLongitude(), sensor.getLocation().getLatitude())
+                ))
+                .toList();
+
+        List<RouteEntity.Feature> features = new ArrayList<>();
+        features.add(routeFeature);
+        features.addAll(sensorFeatures);
+
+        return new RouteEntity(routeId,truckId,features);
+
+    }
+
+    public static Route toDomain(RouteEntity entity) {
+        String routeId = (entity.getId() != null && !entity.getId().isEmpty()) ? entity.getId() : UUID.randomUUID().toString();
+        Truck truck = Truck.create(entity.getTruckId());
+
+        RouteEntity.RouteFeature routeFeature = null;
+        List<RouteEntity.SensorFeature> sensorFeatures = new ArrayList<>();
+
+        for (RouteEntity.Feature feature : entity.getFeatures()) {
+            if (feature instanceof RouteEntity.RouteFeature) {
+                routeFeature = (RouteEntity.RouteFeature) feature;
+            } else if (feature instanceof RouteEntity.SensorFeature) {
+                sensorFeatures.add((RouteEntity.SensorFeature) feature);
+            }
         }
 
-        Map<String, Object> routeFeature = new HashMap<>();
-        routeFeature.put("type", "Feature");
+        Double totalDistance = (Double) routeFeature.getProperties().get("totalDistance");
+        Long estimatedTimeInSeconds = (Long) routeFeature.getProperties().get("estimatedTime");
 
-        Map<String, Object> routeGeometry = new HashMap<>();
-        routeGeometry.put("type", "LineString");
-        routeGeometry.put("coordinates", route.getRouteGeometry().stream()
-                .map(location -> List.of(location.getLongitude(), location.getLatitude()))
-                .toList());
-        routeFeature.put("geometry", routeGeometry);
+        List<Location> routeGeometry = routeFeature.getRouteGeometry().getCoordinates().stream()
+                .map(point -> Location.create(point.getY(), point.getX()))
+                .toList();
 
-        Map<String, Object> routeProperties = new HashMap<>();
-        routeProperties.put("type", "Route");
-        routeProperties.put("totalDistance", route.getTotalDistance());
-        routeProperties.put("estimatedTime", route.getEstimatedTimeInSeconds());
-        routeProperties.put("truckId", route.getTruck().getId());
-        routeFeature.put("properties", routeProperties);
+        List<Sensor> sensors = sensorFeatures.stream()
+                .map(sensorFeature -> Sensor.create(
+                        (Long) sensorFeature.getProperties().get("id"),
+                        Location.create(sensorFeature.getLocation().getY(), sensorFeature.getLocation().getX()),
+                        ContainerState.valueOf((String) sensorFeature.getProperties().get("containerState"))
+                ))
+                .toList();
 
-        features.add(routeFeature);
+        return Route.create(
+                routeId,
+                truck,
+                sensors,
+                totalDistance,
+                estimatedTimeInSeconds,
+                routeGeometry
+        );
 
-        return new RouteEntity(null, "FeatureCollection", features);
     }
 
-    public static Route toDomain(RouteEntity entity, Truck truck, List<Sensor> sensors) {
-        // Parsing GeoJSON back to Route domain is not covered here for simplicity.
-        throw new UnsupportedOperationException("GeoJSON to Route mapping not implemented yet.");
-    }
 }
