@@ -8,6 +8,7 @@ import org.springframework.data.geo.Point;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,26 +26,34 @@ public class RouteMapper {
                         .toList()
         );
 
+        Map<String, Object> routeProperties = Map.of(
+                "totalDistance", route.getTotalDistance(),
+                "estimatedTime", route.getEstimatedTimeInSeconds()
+        );
+
         RouteEntity.RouteFeature routeFeature = new RouteEntity.RouteFeature(
-                route.getTotalDistance(),
-                route.getEstimatedTimeInSeconds(),
+                routeProperties,
                 routeGeometry
         );
 
         List<RouteEntity.SensorFeature> sensorFeatures = route.getSensors().stream()
-                .map(sensor -> new RouteEntity.SensorFeature(
-                        sensor.getId(),
-                        sensor.getContainerState().name(),
-                        new GeoJsonPoint(sensor.getLocation().getLongitude(), sensor.getLocation().getLatitude())
-                ))
+                .map(sensor -> {
+                    Map<String, Object> sensorProperties = Map.of(
+                            "sensorId", sensor.getId(),
+                            "containerState", sensor.getContainerState().name()
+                    );
+                    return new RouteEntity.SensorFeature(
+                            sensorProperties,
+                            new GeoJsonPoint(sensor.getLocation().getLongitude(), sensor.getLocation().getLatitude())
+                    );
+                })
                 .toList();
 
         List<RouteEntity.Feature> features = new ArrayList<>();
         features.add(routeFeature);
         features.addAll(sensorFeatures);
 
-        return new RouteEntity(routeId,truckId,features);
-
+        return new RouteEntity(routeId, truckId, features);
     }
 
     public static Route toDomain(RouteEntity entity) {
@@ -65,17 +74,21 @@ public class RouteMapper {
         Double totalDistance = (Double) routeFeature.getProperties().get("totalDistance");
         Long estimatedTimeInSeconds = (Long) routeFeature.getProperties().get("estimatedTime");
 
-        List<Location> routeGeometry = routeFeature.getRouteGeometry().getCoordinates().stream()
+        List<Location> routeGeometry = ((GeoJsonLineString) routeFeature.getGeometry()).getCoordinates().stream()
                 .map(point -> Location.create(point.getY(), point.getX()))
-                .toList();
+                .collect(Collectors.toList());
+
 
         List<Sensor> sensors = sensorFeatures.stream()
                 .map(sensorFeature -> Sensor.create(
-                        (Long) sensorFeature.getProperties().get("id"),
-                        Location.create(sensorFeature.getLocation().getY(), sensorFeature.getLocation().getX()),
+                        (Long) sensorFeature.getProperties().get("sensorId"),
+                        Location.create(
+                                ((GeoJsonPoint) sensorFeature.getGeometry()).getY(),
+                                ((GeoJsonPoint) sensorFeature.getGeometry()).getX()
+                        ),
                         ContainerState.valueOf((String) sensorFeature.getProperties().get("containerState"))
                 ))
-                .toList();
+                .collect(Collectors.toList());
 
         return Route.create(
                 routeId,

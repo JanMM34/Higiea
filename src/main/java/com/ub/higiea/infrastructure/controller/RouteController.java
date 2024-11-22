@@ -4,6 +4,7 @@ import com.ub.higiea.application.domainservice.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
+import com.ub.higiea.infrastructure.utils.GeoJsonUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -26,20 +27,25 @@ public class RouteController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<RouteDTO> getAllRoutes() {
-        return routeService.getAllRoutes();
+    public Mono<String> getAllRoutes() {
+        return routeService.getAllRoutes()
+                .map(RouteDTO::toGeoJSON)
+                .collectList()
+                .map(GeoJsonUtils::combineRoutes);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<RouteDTO> getRoute(@PathVariable("id") String routeId) {
+    public Mono<String> getRoute(@PathVariable("id") String routeId) {
         return routeService.getRouteById(routeId)
+                .map(RouteDTO::toGeoJSON)
                 .onErrorMap(RouteNotFoundException.class, ex ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(),ex));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<RouteDTO> createRoute(@Valid @RequestBody RouteCreateRequest request) {
+    public Mono<String> createRoute(@Valid @RequestBody RouteCreateRequest request) {
         return routeService.createRoute(request)
+                .map(RouteDTO::toGeoJSON)
                 .onErrorMap(ValidationException.class, ex ->
                         new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
     }

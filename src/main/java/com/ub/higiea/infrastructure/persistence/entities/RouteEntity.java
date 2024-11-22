@@ -38,14 +38,22 @@ public class RouteEntity {
         return this.truckId;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public List<Feature> getFeatures() {
         return features;
     }
 
     public static abstract class Feature {
-        private final String type = "Feature";
-        private final Map<String, Object> properties = new HashMap<>();
-        private final GeoJson geometry;
+
+        private  String type = "Feature";
+
+        private Map<String, Object> properties = new HashMap<>();
+
+        @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+        private  GeoJson geometry;
 
         protected Feature(Map<String, Object> properties, GeoJson geometry) {
             if (properties != null) {
@@ -70,38 +78,16 @@ public class RouteEntity {
 
     public static class SensorFeature extends Feature {
 
-        @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-        private final GeoJsonPoint location;
-
-        public SensorFeature(Long id, String containerState, GeoJsonPoint location) {
-            super(Map.of(
-                    "id", id,
-                    "containerState", containerState
-            ), location);
-            this.location = location;
-        }
-
-        public GeoJsonPoint getLocation() {
-            return location;
+        public SensorFeature(Map<String,Object> properties, GeoJsonPoint geometry) {
+            super(properties,geometry);
         }
 
     }
 
     public static class RouteFeature extends Feature {
 
-        @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-        private final GeoJsonLineString routeGeometry;
-
-        public RouteFeature(Double totalDistance, Long estimatedTime, GeoJsonLineString routeGeometry) {
-            super(Map.of(
-                    "totalDistance", totalDistance,
-                    "estimatedTime", estimatedTime
-            ), routeGeometry);
-            this.routeGeometry = routeGeometry;
-        }
-
-        public GeoJsonLineString getRouteGeometry() {
-            return routeGeometry;
+        public RouteFeature(Map<String,Object> properties, GeoJsonLineString geometry) {
+            super(properties,geometry);
         }
 
     }
