@@ -5,6 +5,7 @@ import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.domain.model.*;
+import com.ub.higiea.infrastructure.utils.GeoJsonUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +40,16 @@ public class RouteControllerTest {
         RouteDTO routeDTO2 = RouteDTO.fromRoute(route2);
 
         Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.just(routeDTO1, routeDTO2));
+        String expectedGeoJSON = GeoJsonUtils.combineRoutes(List.of(routeDTO1.toGeoJSON(), routeDTO2.toGeoJSON()));
+
 
         webTestClient.get()
                 .uri("/routes")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(RouteDTO.class)
-                .hasSize(2)
-                .contains(routeDTO1, routeDTO2);
+                .expectBody(String.class)
+                .isEqualTo(expectedGeoJSON);
     }
 
     @Test
@@ -68,9 +70,9 @@ public class RouteControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(RouteDTO.class)
-                .isEqualTo(expectedRouteDTO);
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectBody(String.class)
+                .isEqualTo(expectedRouteDTO.toGeoJSON());
 
     }
 
@@ -97,9 +99,9 @@ public class RouteControllerTest {
                 .bodyValue(routeCreateRequest)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(RouteDTO.class)
-                .isEqualTo(routeDTO);
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectBody(String.class)
+                .isEqualTo(routeDTO.toGeoJSON());
     }
 
     @Test

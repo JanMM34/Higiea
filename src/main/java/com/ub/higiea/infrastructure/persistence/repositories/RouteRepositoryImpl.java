@@ -41,4 +41,5 @@ public class RouteRepositoryImpl implements RouteRepository {
         return routeEntityRepository.save(routeEntity)
                 .map(RouteMapper::toDomain);
     }
+
 }
