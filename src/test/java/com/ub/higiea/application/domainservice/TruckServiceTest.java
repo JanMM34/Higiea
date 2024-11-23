@@ -2,6 +2,7 @@ package com.ub.higiea.application.domainservice;
 
 import com.ub.higiea.application.dtos.TruckDTO;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
+import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.domain.model.Truck;
 import com.ub.higiea.domain.repository.TruckRepository;
 import org.junit.jupiter.api.BeforeEach;
