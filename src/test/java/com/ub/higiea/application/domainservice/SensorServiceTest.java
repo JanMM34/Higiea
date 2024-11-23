@@ -3,6 +3,7 @@ package com.ub.higiea.application.domainservice;
 import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
@@ -75,7 +76,7 @@ public class SensorServiceTest {
     void createSensor_shouldReturnSensorDTO_WhenValidInput() {
         SensorCreateRequest request = SensorCreateRequest.toRequest(
                 10.0, 20.0,
-                ContainerState.EMPTY
+                "EMPTY"
         );
         Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
 

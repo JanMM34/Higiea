@@ -2,6 +2,7 @@ package com.ub.higiea.application.domainservice;
 
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.requests.RouteCreateRequest;
+import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.application.utils.RouteCalculationResult;
 import com.ub.higiea.domain.model.*;

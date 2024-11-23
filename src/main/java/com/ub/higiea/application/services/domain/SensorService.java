@@ -1,8 +1,9 @@
-package com.ub.higiea.application.domainservice;
+package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.SensorDTO;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
+import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
@@ -34,7 +35,7 @@ public class SensorService {
         Sensor sensor = Sensor.create(
                 null,
                 Location.create(request.getLatitude(), request.getLongitude()),
-                request.getContainerState()
+                ContainerState.valueOf(request.getContainerState())
         );
         return sensorRepository.save(sensor)
                 .map(SensorDTO::fromSensor);

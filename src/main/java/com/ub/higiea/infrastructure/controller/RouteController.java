@@ -1,6 +1,6 @@
 package com.ub.higiea.infrastructure.controller;
 
-import com.ub.higiea.application.domainservice.RouteService;
+import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController

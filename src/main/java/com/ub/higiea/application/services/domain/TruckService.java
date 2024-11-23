@@ -1,4 +1,4 @@
-package com.ub.higiea.application.domainservice;
+package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.TruckDTO;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;

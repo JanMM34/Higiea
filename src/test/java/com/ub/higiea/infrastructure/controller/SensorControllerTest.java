@@ -1,7 +1,7 @@
 package com.ub.higiea.infrastructure.controller;
 
 import com.ub.higiea.application.dtos.SensorDTO;
-import com.ub.higiea.application.domainservice.SensorService;
+import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.ContainerState;
@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @WebFluxTest(controllers = SensorController.class)
 public class SensorControllerTest {
@@ -70,7 +72,7 @@ public class SensorControllerTest {
         SensorCreateRequest sensorCreateRequest = SensorCreateRequest.toRequest(
                 10.0,
                 20.0,
-                ContainerState.EMPTY
+                "EMPTY"
         );
         Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
         SensorDTO sensorDTO = SensorDTO.fromSensor(sensor);
@@ -78,7 +80,7 @@ public class SensorControllerTest {
         Mockito.when(sensorService.createSensor(Mockito.argThat(request ->
                 request.getLatitude().equals(sensorCreateRequest.getLatitude()) &&
                         request.getLongitude().equals(sensorCreateRequest.getLongitude()) &&
-                        request.getContainerState() == sensorCreateRequest.getContainerState()
+                        Objects.equals(request.getContainerState(), sensorCreateRequest.getContainerState())
         ))).thenReturn(Mono.just(sensorDTO));
 
         webTestClient.post()
@@ -112,7 +114,7 @@ public class SensorControllerTest {
         SensorCreateRequest invalidRequest = SensorCreateRequest.toRequest(
                 null,
                 20.0,
-                ContainerState.EMPTY
+                "EMPTY"
         );
 
         webTestClient.post()
