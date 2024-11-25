@@ -42,4 +42,9 @@ public class RouteRepositoryImpl implements RouteRepository {
                 .map(RouteMapper::toDomain);
     }
 
+    @Override
+    public Mono<Void> deleteById(String id) {
+        return routeEntityRepository.deleteById(id);
+    }
+
 }

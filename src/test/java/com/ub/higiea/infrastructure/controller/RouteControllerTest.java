@@ -79,7 +79,6 @@ public class RouteControllerTest {
     @Test
     void createRoute_ShouldReturnCreatedRouteDTO() {
         RouteCreateRequest routeCreateRequest = RouteCreateRequest.toRequest(
-                1L,
                 List.of(1L, 2L)
         );
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
@@ -89,8 +88,7 @@ public class RouteControllerTest {
         RouteDTO routeDTO = RouteDTO.fromRoute(route);
 
         Mockito.when(routeService.createRoute(Mockito.argThat(request ->
-                request.getTruckId().equals(routeCreateRequest.getTruckId()) &&
-                        request.getSensorIds().equals(routeCreateRequest.getSensorIds())
+                request.getSensorIds().equals(routeCreateRequest.getSensorIds())
         ))).thenReturn(Mono.just(routeDTO));
 
         webTestClient.post()
@@ -120,7 +118,7 @@ public class RouteControllerTest {
 
     @Test
     void createRoute_ShouldReturnBadRequest_WhenInputIsInvalid() {
-        RouteCreateRequest invalidRequest = RouteCreateRequest.toRequest(null, List.of(1L, 2L));
+        RouteCreateRequest invalidRequest = RouteCreateRequest.toRequest(null);
 
         webTestClient.post()
                 .uri("/routes")
