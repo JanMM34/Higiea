@@ -6,22 +6,17 @@ import java.util.List;
 
 public class RouteCreateRequest {
 
-    @NotNull(message = "Truck cannot be null")
-    private final Long truckId;
     @NotNull(message = "Sensors cannot be null")
-    private final List<Long> sensorIds;
+    private List<Long> sensorIds;
 
-    public RouteCreateRequest(Long truckId, List<Long> sensorIds) {
-        this.truckId = truckId;
+    public RouteCreateRequest() {}
+
+    public RouteCreateRequest(List<Long> sensorIds) {
         this.sensorIds = sensorIds;
     }
 
-    public static RouteCreateRequest toRequest(Long truckId, List<Long> sensorIds) {
-        return new RouteCreateRequest(truckId, sensorIds);
-    }
-
-    public Long getTruckId() {
-        return truckId;
+    public static RouteCreateRequest toRequest(List<Long> sensorIds) {
+        return new RouteCreateRequest(sensorIds);
     }
 
     public List<Long> getSensorIds() {

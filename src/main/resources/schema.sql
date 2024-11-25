@@ -11,5 +11,6 @@ CREATE TABLE sensor (
 );
 
 CREATE TABLE truck (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    route VARCHAR(255)
 );

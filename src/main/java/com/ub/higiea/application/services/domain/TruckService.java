@@ -32,4 +32,17 @@ public class TruckService {
                 .map(TruckDTO::fromTruck);
     }
 
+    public Mono<TruckDTO> unassignRouteFromTruck(Long truckId) {
+        return truckRepository.findById(truckId)
+                .switchIfEmpty(Mono.error(new TruckNotFoundException(truckId)))
+                .flatMap(truck -> {
+                    if (truck.hasAssignedRoute()) {
+                        truck.unassignRoute();
+                        return truckRepository.save(truck).map(TruckDTO::fromTruck);
+                    } else {
+                        return Mono.error(new IllegalArgumentException("Truck does not have an assigned route."));
+                    }
+                });
+    }
+
 }

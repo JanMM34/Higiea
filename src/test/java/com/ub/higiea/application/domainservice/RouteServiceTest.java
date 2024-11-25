@@ -12,6 +12,7 @@ import com.ub.higiea.domain.repository.TruckRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -40,7 +41,7 @@ public class RouteServiceTest {
         Long truckId = 1L;
         List<Long> sensorIds = List.of(1L, 2L);
 
-        RouteCreateRequest request = RouteCreateRequest.toRequest(truckId, sensorIds);
+        RouteCreateRequest request = RouteCreateRequest.toRequest(sensorIds);
 
         Truck truck = Truck.create(truckId);
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
@@ -56,7 +57,6 @@ public class RouteServiceTest {
                 routeGeometry
         );
 
-        Mockito.when(truckRepository.findById(truckId)).thenReturn(Mono.just(truck));
         Mockito.when(sensorRepository.findById(1L)).thenReturn(Mono.just(sensor1));
         Mockito.when(sensorRepository.findById(2L)).thenReturn(Mono.just(sensor2));
         Mockito.when(routeCalculator.calculateRoute(sensors)).thenReturn(Mono.just(calculationResult));
@@ -65,12 +65,13 @@ public class RouteServiceTest {
         RouteDTO expectedRouteDTO = RouteDTO.fromRoute(route);
 
         Mockito.when(routeRepository.save(Mockito.any(Route.class))).thenReturn(Mono.just(route));
+        Mockito.when(truckRepository.findAll()).thenReturn(Flux.just(truck));
+        Mockito.when(truckRepository.save(Mockito.any(Truck.class))).thenReturn(Mono.just(truck));
 
         StepVerifier.create(routeService.createRoute(request))
                 .expectNextMatches(dto -> dto.equals(expectedRouteDTO))
                 .verifyComplete();
 
-        Mockito.verify(truckRepository).findById(truckId);
         Mockito.verify(sensorRepository).findById(1L);
         Mockito.verify(sensorRepository).findById(2L);
         Mockito.verify(routeCalculator).calculateRoute(sensors);

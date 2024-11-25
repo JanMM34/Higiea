@@ -1,5 +1,6 @@
 package com.ub.higiea.application.services.domain;
 
+import com.ub.higiea.application.exception.notfound.NotFoundException;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.utils.RouteCalculator;
@@ -12,8 +13,10 @@ import com.ub.higiea.domain.repository.RouteRepository;
 import com.ub.higiea.domain.repository.SensorRepository;
 import com.ub.higiea.domain.repository.TruckRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.util.List;
 
@@ -45,18 +48,30 @@ public class RouteService {
                 .map(RouteDTO::fromRoute);
     }
 
-    public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
-        return Mono.zip(
-                        fetchTruck(request.getTruckId()),
-                        fetchSensors(request.getSensorIds())
-                )
-                .flatMap(tuple -> calculateAndSaveRoute(tuple.getT1(), tuple.getT2()))
-                .map(RouteDTO::fromRoute);
+    public Mono<Void> deleteRouteById(String routeId) {
+        return routeRepository.findById(routeId)
+                .switchIfEmpty(Mono.error(new RouteNotFoundException(routeId)))
+                .flatMap(route -> {
+                    Truck truck = route.getTruck();
+                    truck.unassignRoute();
+                    return truckRepository.save(truck)
+                            .then(routeRepository.deleteById(routeId));
+                });
     }
 
-    private Mono<Truck> fetchTruck(Long truckId) {
-        return truckRepository.findById(truckId)
-                .switchIfEmpty(Mono.error(new TruckNotFoundException(truckId)));
+    @Transactional
+    public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
+        return fetchAvailableTruck()
+                .switchIfEmpty(Mono.error(new NotFoundException("No available trucks found")))
+                .zipWith(fetchSensors(request.getSensorIds())).flatMap(
+                        tuple -> calculateAndSaveRoute(tuple.getT1(), tuple.getT2())
+                ).map(RouteDTO::fromRoute);
+    }
+
+    private Mono<Truck> fetchAvailableTruck() {
+        return truckRepository.findAll()
+                .filter(truck -> !truck.hasAssignedRoute())
+                .next();
     }
 
     private Mono<List<Sensor>> fetchSensors(List<Long> sensorIds) {
@@ -65,7 +80,7 @@ public class RouteService {
                 .collectList()
                 .flatMap(sensors -> {
                     if (sensors.size() != sensorIds.size()) {
-                        return Mono.error(new IllegalArgumentException("One or more sensors not found."));
+                        return Mono.error(new NotFoundException("One or more sensors not found."));
                     }
                     return Mono.just(sensors);
                 });
@@ -82,7 +97,17 @@ public class RouteService {
                             result.getEstimatedTimeInSeconds(),
                             result.getRouteGeometry()
                     );
-                    return routeRepository.save(route);
+
+                    return routeRepository.save(route)
+                            .flatMap(savedRoute -> {
+                                truck.assignRoute(savedRoute);
+                                return truckRepository.save(truck)
+                                        .thenReturn(savedRoute);
+                            })
+                            .onErrorResume(e ->
+                                    routeRepository.deleteById(route.getId())
+                                    .then(Mono.error(e))
+                            );
                 });
     }
 

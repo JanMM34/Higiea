@@ -7,22 +7,27 @@ import java.util.Objects;
 public class TruckDTO implements Serializable {
 
     private Long id;
+    private String routeId;
 
     public TruckDTO() {
     }
 
-    private TruckDTO(Long id) {
+    private TruckDTO(Long id, String routeId) {
         this.id = id;
+        this.routeId = routeId;
     }
 
     public static TruckDTO fromTruck(Truck truck) {
-        return new TruckDTO(
-                truck.getId()
-        );
+        String routeId = truck.hasAssignedRoute() ? truck.getAssignedRoute().getId() : null;
+        return new TruckDTO(truck.getId(), routeId);
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getRouteId() {
+        return routeId;
     }
 
     @Override
@@ -30,12 +35,13 @@ public class TruckDTO implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TruckDTO truckDTO = (TruckDTO) o;
-        return Objects.equals(this.id,truckDTO.id);
+        return Objects.equals(this.id, truckDTO.id) &&
+                Objects.equals(this.routeId, truckDTO.routeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, routeId);
     }
 
 }

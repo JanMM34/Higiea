@@ -26,16 +26,15 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
     public Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors) {
         return calculateOptimizedRoute(sensors)
                 .map(routeDirections -> {
+
                     List<Sensor> orderedSensors = new ArrayList<>(sensors);
-                    // Extract optimized waypoints
+
                     List<RouteOptimizedWaypoint> optimizedWaypoints = routeDirections.getOptimizedWaypoints();
 
-                    // Iterate over optimized waypoints and place them in the correct order
                     for (RouteOptimizedWaypoint waypoint : optimizedWaypoints) {
                         int providedIndex = waypoint.getProvidedIndex();
                         int optimizedIndex = waypoint.getOptimizedIndex();
 
-                        // Move the sensor from the provided index to the new optimized index
                         Sensor sensorToMove = sensors.get(providedIndex);
                         orderedSensors.set(optimizedIndex, sensorToMove);
                     }
@@ -50,6 +49,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                             .getLegs().stream()
                             .flatMap(leg -> leg.getPoints().stream())
                             .toList();
+
 
                     List<Location> routeGeometry = routeGeometryPoints.stream()
                             .map(geoPosition -> Location.create(geoPosition.getLatitude(), geoPosition.getLongitude()))

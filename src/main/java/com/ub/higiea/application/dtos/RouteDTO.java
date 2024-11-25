@@ -88,6 +88,8 @@ public class RouteDTO implements Serializable {
 
         ObjectNode featureCollection = mapper.createObjectNode();
         featureCollection.put("type", "FeatureCollection");
+        featureCollection.put("id",this.id);
+        featureCollection.put("truckId", this.truck.getId());
 
         ArrayNode featuresArray = mapper.createArrayNode();
 
