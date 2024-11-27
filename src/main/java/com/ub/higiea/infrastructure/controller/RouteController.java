@@ -41,11 +41,11 @@ public class RouteController {
                         new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(),ex));
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> createRoute(@Valid @RequestBody RouteCreateRequest request) {
         return routeService.createRoute(request)
                 .map(RouteDTO::toGeoJSON)
                 .onErrorMap(ValidationException.class, ex ->
                         new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
-    }
+    }*/
 }

@@ -12,5 +12,8 @@ CREATE TABLE sensor (
 
 CREATE TABLE truck (
     id SERIAL PRIMARY KEY,
-    route VARCHAR(255)
+    route VARCHAR(255),
+    max_load_capacity INT,
+    depot_latitude DOUBLE PRECISION NOT NULL,
+    depot_longitude DOUBLE PRECISION NOT NULL
 );

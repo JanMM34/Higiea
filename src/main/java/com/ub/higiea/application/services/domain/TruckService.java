@@ -1,7 +1,12 @@
 package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.TruckDTO;
+import com.ub.higiea.application.exception.notfound.NotFoundException;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
+import com.ub.higiea.application.requests.SensorCreateRequest;
+import com.ub.higiea.application.requests.TruckCreateRequest;
+import com.ub.higiea.domain.model.Location;
+import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Truck;
 import com.ub.higiea.domain.repository.TruckRepository;
 import org.springframework.stereotype.Service;
@@ -26,10 +31,19 @@ public class TruckService {
                 .map(TruckDTO::fromTruck);
     }
 
-    public Mono<TruckDTO> createTruck() {
-        Truck truck = Truck.create(null);
-        return truckRepository.save(truck)
+    public Mono<TruckDTO> createTruck(TruckCreateRequest request) {
+        return truckRepository.save(
+                Truck.create(null, request.getMaxLoadCapacity(),
+                        Location.create(request.getLatitude(), request.getLongitude()))
+                )
                 .map(TruckDTO::fromTruck);
+    }
+
+    public Mono<Truck> fetchAvailableTruck() {
+        return truckRepository.findAll()
+                .filter(truck -> !truck.hasAssignedRoute())
+                .next()
+                .switchIfEmpty(Mono.error(new NotFoundException("No available trucks found")));
     }
 
     public Mono<TruckDTO> unassignRouteFromTruck(Long truckId) {
@@ -43,6 +57,12 @@ public class TruckService {
                         return Mono.error(new IllegalArgumentException("Truck does not have an assigned route."));
                     }
                 });
+    }
+
+
+    public Mono<Truck> assignRouteToTruck(Truck truck, Route savedRoute) {
+        truck.assignRoute(savedRoute);
+        return truckRepository.save(truck);
     }
 
 }

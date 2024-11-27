@@ -4,17 +4,16 @@ import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
 import com.ub.higiea.infrastructure.persistence.entities.SensorEntity;
 import com.ub.higiea.infrastructure.persistence.mapper.SensorMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public class SensorRespositoryImpl implements SensorRepository {
+public class SensorRepositoryImpl implements SensorRepository {
 
     private final SensorEntityRepository sensorEntityRepository;
 
-    public SensorRespositoryImpl(SensorEntityRepository sensorEntityRepository) {
+    public SensorRepositoryImpl(SensorEntityRepository sensorEntityRepository) {
         this.sensorEntityRepository = sensorEntityRepository;
     }
 

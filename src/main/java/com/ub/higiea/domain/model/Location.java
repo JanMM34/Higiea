@@ -2,8 +2,9 @@ package com.ub.higiea.domain.model;
 
 public class Location {
 
-    double latitude;
-    double longitude;
+    private double latitude;
+
+    private double longitude;
 
     private Location(double latitude, double longitude) {
         this.latitude = latitude;

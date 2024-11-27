@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
+
 @Service
 public class SensorService {
 
@@ -39,6 +41,22 @@ public class SensorService {
         );
         return sensorRepository.save(sensor)
                 .map(SensorDTO::fromSensor);
+    }
+
+    public Mono<Sensor> updateSensorState(Long sensorId, int state) {
+        return sensorRepository.findById(sensorId)
+                .switchIfEmpty(Mono.error(new SensorNotFoundException(sensorId)))
+                .flatMap(sensor -> {
+                    sensor.setContainerState(ContainerState.fromLevel(state));
+                    return sensorRepository.save(sensor);
+                });
+    }
+
+    public Flux<Sensor> fetchRelevantSensors(int capacity) {
+        return sensorRepository.findAll()
+                .filter(sensor -> sensor.getContainerState() != ContainerState.EMPTY)
+                .sort(Comparator.comparingInt(sensor -> -sensor.getContainerState().getLevel()))
+                .take(capacity);
     }
 
 }

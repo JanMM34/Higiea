@@ -32,7 +32,7 @@ public class RouteServiceTest {
         routeRepository = Mockito.mock(RouteRepository.class);
         truckRepository = Mockito.mock(TruckRepository.class);
         sensorRepository = Mockito.mock(SensorRepository.class);
-        routeService = new RouteService(routeCalculator, routeRepository, truckRepository, sensorRepository);
+        routeService = new RouteService(routeCalculator, routeRepository);
     }
 
     @Test
