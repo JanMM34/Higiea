@@ -7,17 +7,18 @@ import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -99,6 +100,34 @@ public class SensorServiceTest {
         assertEquals(request.getLatitude(), savedSensor.getLocation().getLatitude());
         assertEquals(request.getLongitude(), savedSensor.getLocation().getLongitude());
         assertEquals(ContainerState.valueOf(request.getContainerState()), savedSensor.getContainerState());
+    }
+
+    @Test
+    void fetchRelevantSensors_ShouldPrioritizeSensorsByContainerState() {
+
+        int capacity = 5;
+
+        Sensor sensorFull1 = Sensor.create(1L, Location.create(10.0, 20.0), ContainerState.FULL);
+        Sensor sensorHalf1 = Sensor.create(2L, Location.create(15.0, 25.0), ContainerState.HALF);
+        Sensor sensorEmpty1 = Sensor.create(3L, Location.create(20.0, 30.0), ContainerState.EMPTY);
+        Sensor sensorEmpty2 = Sensor.create(3L, Location.create(20.0, 30.0), ContainerState.EMPTY);
+        Sensor sensorFull2 = Sensor.create(4L, Location.create(25.0, 35.0), ContainerState.FULL);
+        Sensor sensorHalf2 = Sensor.create(5L, Location.create(30.0, 40.0), ContainerState.HALF);
+
+        List<Sensor> allSensors = Arrays.asList(sensorFull1, sensorHalf1, sensorEmpty1, sensorEmpty2, sensorFull2, sensorHalf2);
+
+        when(sensorRepository.findAll()).thenReturn(Flux.fromIterable(allSensors));
+
+        Flux<Sensor> result = sensorService.fetchRelevantSensors(capacity);
+
+        StepVerifier.create(result)
+                .expectNext(sensorFull1)
+                .expectNext(sensorFull2)
+                .expectNext(sensorHalf1)
+                .expectNext(sensorHalf2)
+                .verifyComplete();
+
+        verify(sensorRepository, times(1)).findAll();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.ub.higiea.domain.model;
 
+import org.springframework.data.annotation.Transient;
+
 public class Truck {
 
     private Long id;

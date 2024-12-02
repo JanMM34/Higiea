@@ -42,8 +42,7 @@ public class TruckService {
     public Mono<Truck> fetchAvailableTruck() {
         return truckRepository.findAll()
                 .filter(truck -> !truck.hasAssignedRoute())
-                .next()
-                .switchIfEmpty(Mono.error(new NotFoundException("No available trucks found")));
+                .next();
     }
 
     public Mono<TruckDTO> unassignRouteFromTruck(Long truckId) {
@@ -65,4 +64,7 @@ public class TruckService {
         return truckRepository.save(truck);
     }
 
+    public Mono<Truck> getTruckByIdAsEntity(Long truckId) {
+        return truckRepository.findById(truckId).switchIfEmpty(Mono.error(new TruckNotFoundException(truckId)));
+    }
 }

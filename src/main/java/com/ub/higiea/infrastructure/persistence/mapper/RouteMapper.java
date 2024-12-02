@@ -18,7 +18,7 @@ public class RouteMapper {
 
         String routeId = (route.getId() != null && !route.getId().isEmpty()) ? route.getId()
                 : UUID.randomUUID().toString();
-        Long truckId = route.getTruck().getId();
+        Truck truck = route.getTruck();
 
         GeoJsonLineString routeGeometry = new GeoJsonLineString(
                 route.getRouteGeometry().stream()
@@ -53,12 +53,12 @@ public class RouteMapper {
         features.add(routeFeature);
         features.addAll(sensorFeatures);
 
-        return new RouteEntity(routeId, truckId, features);
+        return new RouteEntity(routeId, truck, features);
     }
 
     public static Route toDomain(RouteEntity entity) {
         String routeId = (entity.getId() != null && !entity.getId().isEmpty()) ? entity.getId() : UUID.randomUUID().toString();
-        Truck truck = Truck.create(entity.getTruckId());
+        Truck truck = entity.getTruck();
 
         RouteEntity.RouteFeature routeFeature = null;
         List<RouteEntity.SensorFeature> sensorFeatures = new ArrayList<>();
@@ -76,7 +76,7 @@ public class RouteMapper {
 
         List<Location> routeGeometry = ((GeoJsonLineString) routeFeature.getGeometry()).getCoordinates().stream()
                 .map(point -> Location.create(point.getY(), point.getX()))
-                .collect(Collectors.toList());
+                .toList();
 
 
         List<Sensor> sensors = sensorFeatures.stream()
@@ -88,7 +88,7 @@ public class RouteMapper {
                         ),
                         ContainerState.valueOf((String) sensorFeature.getProperties().get("containerState"))
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         return Route.create(
                 routeId,

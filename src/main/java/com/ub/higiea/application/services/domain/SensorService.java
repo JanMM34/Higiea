@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class SensorService {
@@ -31,6 +32,14 @@ public class SensorService {
         return sensorRepository.findById(id)
                 .switchIfEmpty(Mono.error(new SensorNotFoundException(id)))
                 .map(SensorDTO::fromSensor);
+    }
+
+    public Flux<Sensor> getSensorsByIds(List<Long> ids) {
+        return Flux.fromIterable(ids)
+                .flatMap(
+                        id -> sensorRepository.findById(id)
+                        .switchIfEmpty(Mono.error(new SensorNotFoundException(id)))
+                );
     }
 
     public Mono<SensorDTO> createSensor(SensorCreateRequest request) {
