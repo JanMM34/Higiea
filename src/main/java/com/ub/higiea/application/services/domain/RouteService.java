@@ -36,7 +36,6 @@ public class RouteService {
                 .map(RouteDTO::fromRoute);
     }
 
-
     public Mono<Route> calculateAndSaveRoute(Truck truck, List<Sensor> sensorWaypoints) {
         return routeCalculator.calculateRoute(truck.getDepotLocation(),sensorWaypoints)
                 .flatMap(result -> {

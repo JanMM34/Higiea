@@ -21,10 +21,6 @@ public class Truck {
         return new Truck(id, null, maxLoadCapacity, depotLocation);
     }
 
-    public static Truck create(Long id){
-        return new Truck(id, null, -1, null);
-    }
-
     public Long getId() {
         return id;
     }
