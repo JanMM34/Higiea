@@ -11,10 +11,8 @@ import com.ub.higiea.domain.repository.SensorRepository;
 import com.ub.higiea.domain.repository.TruckRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -22,44 +20,44 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class MessageServiceIntegrationTest {
 
-    @Autowired
-    private MessageService messageService;
-
-    @Autowired
-    private SensorService sensorService;
-
-    @Autowired
-    private TruckService truckService;
-
-    @Autowired
-    private RouteService routeService;
-
-    @MockBean
+    @Mock
     private SensorRepository sensorRepository;
 
-    @MockBean
+    @Mock
     private TruckRepository truckRepository;
 
-    @MockBean
+    @Mock
     private RouteRepository routeRepository;
 
-    @MockBean(name="routeCalculator")
+    @Mock
     private RouteCalculator routeCalculator;
 
+    private SensorService sensorService;
+    private TruckService truckService;
+    private RouteService routeService;
+
+
+    private MessageService messageService;
+
     @BeforeEach
-    public void setUp() {
-        Mockito.reset(sensorRepository, truckRepository, routeRepository, routeCalculator);
+    void setUp() {
+
+        sensorService = new SensorService(sensorRepository);
+        truckService = new TruckService(truckRepository);
+        routeService = new RouteService(routeCalculator, routeRepository);
+
+        messageService = new MessageService(sensorService, routeService, truckService);
     }
 
     @Test
     void handleMessage_FullFlow_Success() {
-
         Long sensorId = 1L;
-        int state = 80;
+        int stateFull = 80;
 
         Sensor existingSensor = Sensor.create(sensorId, Location.create(10.0, 20.0), ContainerState.EMPTY);
 
@@ -97,10 +95,13 @@ public class MessageServiceIntegrationTest {
                 calculationResult.getEstimatedTimeInSeconds(), calculationResult.getRouteGeometry());
         when(routeRepository.save(any(Route.class))).thenReturn(Mono.just(route));
 
-        Mono<Void> result = messageService.handleMessage(sensorId, state);
+
+        Mono<Void> result = messageService.handleMessage(sensorId, stateFull);
+
 
         StepVerifier.create(result)
                 .verifyComplete();
+
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
@@ -109,6 +110,7 @@ public class MessageServiceIntegrationTest {
         verify(routeCalculator, times(1)).calculateRoute(truck.getDepotLocation(), sensors);
         verify(routeRepository, times(1)).save(any(Route.class));
         verify(truckRepository, times(1)).save(any(Truck.class));
+
     }
 
     @Test
@@ -126,16 +128,22 @@ public class MessageServiceIntegrationTest {
 
         when(sensorRepository.save(any(Sensor.class))).thenReturn(Mono.just(updatedSensor));
 
+
         when(truckRepository.findAll()).thenReturn(Flux.empty());
+
 
         Mono<Void> result = messageService.handleMessage(sensorId, state);
 
+
         StepVerifier.create(result)
                 .verifyComplete();
+
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
         verify(truckRepository, times(1)).findAll();
         verifyNoMoreInteractions(sensorRepository, truckRepository, routeRepository, routeCalculator);
+
     }
+
 }
