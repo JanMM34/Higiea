@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.controller;
 
+import com.ub.higiea.application.services.MessageService;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
@@ -26,6 +27,9 @@ public class RouteControllerTest {
 
     @MockBean
     private RouteService routeService;
+
+    @MockBean
+    private MessageService messageService;
 
     @Test
     void getAllRoutes_ShouldReturnCombinedGeoJSON_WhenRoutesExist() {
