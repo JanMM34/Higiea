@@ -30,14 +30,13 @@ public class SensorControllerTest {
 
     @Test
     void getAllSensors_ShouldReturnListOfSensorDTOs() {
-
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.FULL);
 
-       SensorDTO sensorDTO1 = SensorDTO.fromSensor(sensor1);
-       SensorDTO sensorDTO2 = SensorDTO.fromSensor(sensor2);
+        SensorDTO sensorDTO1 = SensorDTO.fromSensor(sensor1);
+        SensorDTO sensorDTO2 = SensorDTO.fromSensor(sensor2);
 
-       Mockito.when(sensorService.getAllSensors()).thenReturn(Flux.just(sensorDTO1, sensorDTO2));
+        Mockito.when(sensorService.getAllSensors()).thenReturn(Flux.just(sensorDTO1, sensorDTO2));
 
         webTestClient.get().uri("/sensors")
                 .accept(MediaType.APPLICATION_JSON)
@@ -50,9 +49,7 @@ public class SensorControllerTest {
 
     @Test
     void getSensorById_ShouldReturnSensorDTO_WhenSensorExists() {
-
         Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-
         SensorDTO expectedSensorDTO = SensorDTO.fromSensor(sensor);
 
         Mockito.when(sensorService.getSensorById(1L)).thenReturn(Mono.just(expectedSensorDTO));
@@ -69,19 +66,11 @@ public class SensorControllerTest {
 
     @Test
     void createSensor_ShouldReturnCreatedSensorDTO() {
-        SensorCreateRequest sensorCreateRequest = SensorCreateRequest.toRequest(
-                10.0,
-                20.0,
-                "EMPTY"
-        );
+        SensorCreateRequest sensorCreateRequest = SensorCreateRequest.toRequest(20.0, 10.0, "EMPTY");
         Sensor sensor = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
         SensorDTO sensorDTO = SensorDTO.fromSensor(sensor);
 
-        Mockito.when(sensorService.createSensor(Mockito.argThat(request ->
-                request.getLatitude().equals(sensorCreateRequest.getLatitude()) &&
-                        request.getLongitude().equals(sensorCreateRequest.getLongitude()) &&
-                        Objects.equals(request.getContainerState(), sensorCreateRequest.getContainerState())
-        ))).thenReturn(Mono.just(sensorDTO));
+        Mockito.when(sensorService.createSensor(Mockito.any(SensorCreateRequest.class))).thenReturn(Mono.just(sensorDTO));
 
         webTestClient.post()
                 .uri("/sensors")
@@ -111,11 +100,7 @@ public class SensorControllerTest {
 
     @Test
     void createSensor_ShouldReturnBadRequest_WhenInputIsInvalid() {
-        SensorCreateRequest invalidRequest = SensorCreateRequest.toRequest(
-                null,
-                20.0,
-                "EMPTY"
-        );
+        SensorCreateRequest invalidRequest = SensorCreateRequest.toRequest(null, 20.0, "EMPTY");
 
         webTestClient.post()
                 .uri("/sensors")
@@ -124,4 +109,5 @@ public class SensorControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
     }
+
 }

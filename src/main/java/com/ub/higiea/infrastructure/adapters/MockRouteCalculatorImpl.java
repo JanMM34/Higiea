@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class MockRouteCalculatorImpl implements RouteCalculator {
 
     @Override
-    public Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors) {
+    public Mono<RouteCalculationResult> calculateRoute(Location depotBase,List<Sensor> sensors) {
 
         List<Sensor> orderedSensors = sensors.stream()
                 .sorted(Comparator.comparingLong(Sensor::getId))

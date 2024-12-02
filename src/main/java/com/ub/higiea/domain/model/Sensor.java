@@ -33,4 +33,8 @@ public class Sensor {
         return containerState;
     }
 
+    public void setContainerState(ContainerState containerState) {
+        this.containerState = containerState;
+    }
+
 }

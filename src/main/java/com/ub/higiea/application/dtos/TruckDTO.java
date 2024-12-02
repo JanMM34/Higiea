@@ -1,25 +1,37 @@
 package com.ub.higiea.application.dtos;
 
 import com.ub.higiea.domain.model.Truck;
+import org.springframework.data.geo.Point;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public class TruckDTO implements Serializable {
 
-    private Long id;
-    private String routeId;
+    private final Long id;
+    private final String routeId;
+    private final int maxLoadCapacity;
+    private final Point depotLocation;
 
-    public TruckDTO() {
-    }
-
-    private TruckDTO(Long id, String routeId) {
+    private TruckDTO(Long id, String routeId, int maxLoadCapacity, Point depotLocation) {
         this.id = id;
         this.routeId = routeId;
+        this.maxLoadCapacity = maxLoadCapacity;
+        this.depotLocation = depotLocation;
     }
 
     public static TruckDTO fromTruck(Truck truck) {
         String routeId = truck.hasAssignedRoute() ? truck.getAssignedRoute().getId() : null;
-        return new TruckDTO(truck.getId(), routeId);
+
+        return new TruckDTO(
+                truck.getId(),
+                routeId,
+                truck.getMaxLoadCapacity(),
+                new Point(
+                        truck.getDepotLocation().getLatitude(),
+                        truck.getDepotLocation().getLongitude()
+                )
+        );
     }
 
     public Long getId() {
@@ -28,6 +40,14 @@ public class TruckDTO implements Serializable {
 
     public String getRouteId() {
         return routeId;
+    }
+
+    public int getMaxLoadCapacity() {
+        return maxLoadCapacity;
+    }
+
+    public Point getDepotLocation() {
+        return depotLocation;
     }
 
     @Override

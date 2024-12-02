@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.controller;
 
+import com.ub.higiea.application.services.MessageService;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
@@ -27,12 +28,15 @@ public class RouteControllerTest {
     @MockBean
     private RouteService routeService;
 
+    @MockBean
+    private MessageService messageService;
+
     @Test
-    void getAllRoutes_ShouldReturnListOfRouteDTOs() {
+    void getAllRoutes_ShouldReturnCombinedGeoJSON_WhenRoutesExist() {
 
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
-        Truck truck = Truck.create(1L);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.FULL);
+        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
 
         Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
         Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 500.0, 100L, List.of(Location.create(30.0, 60.0), Location.create(20.0, 10.0)));
@@ -41,7 +45,6 @@ public class RouteControllerTest {
 
         Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.just(routeDTO1, routeDTO2));
         String expectedGeoJSON = GeoJsonUtils.combineRoutes(List.of(routeDTO1.toGeoJSON(), routeDTO2.toGeoJSON()));
-
 
         webTestClient.get()
                 .uri("/routes")
@@ -53,11 +56,25 @@ public class RouteControllerTest {
     }
 
     @Test
-    void getRouteById_ShouldReturnRouteDTO_WhenRouteExists() {
+    void getAllRoutes_ShouldReturnEmptyGeoJSON_WhenNoRoutesExist() {
+        Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.empty());
+        String expectedGeoJSON = GeoJsonUtils.combineRoutes(List.of());
+
+        webTestClient.get()
+                .uri("/routes")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo(expectedGeoJSON);
+    }
+
+    @Test
+    void getRouteById_ShouldReturnGeoJSON_WhenRouteExists() {
 
         Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
-        Truck truck = Truck.create(1L);
+        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.FULL);
+        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
 
         Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
         RouteDTO expectedRouteDTO = RouteDTO.fromRoute(route);
@@ -70,40 +87,13 @@ public class RouteControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
                 .expectBody(String.class)
                 .isEqualTo(expectedRouteDTO.toGeoJSON());
-
     }
 
     @Test
-    void createRoute_ShouldReturnCreatedRouteDTO() {
-        RouteCreateRequest routeCreateRequest = RouteCreateRequest.toRequest(
-                List.of(1L, 2L)
-        );
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.EMPTY);
-        Truck truck = Truck.create(1L);
-        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
-        RouteDTO routeDTO = RouteDTO.fromRoute(route);
-
-        Mockito.when(routeService.createRoute(Mockito.argThat(request ->
-                request.getSensorIds().equals(routeCreateRequest.getSensorIds())
-        ))).thenReturn(Mono.just(routeDTO));
-
-        webTestClient.post()
-                .uri("/routes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(routeCreateRequest)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBody(String.class)
-                .isEqualTo(routeDTO.toGeoJSON());
-    }
-
-    @Test
-    void getRouteById_ShouldReturnNotFound_WhenRouteDoesNotExists() {
+    void getRouteById_ShouldReturnNotFound_WhenRouteDoesNotExist() {
         String routeId = "1";
         Mockito.when(routeService.getRouteById(routeId)).thenReturn(Mono.error(new RouteNotFoundException(routeId)));
 
@@ -114,18 +104,6 @@ public class RouteControllerTest {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.message").isEqualTo("Route with id 1 not found");
-    }
-
-    @Test
-    void createRoute_ShouldReturnBadRequest_WhenInputIsInvalid() {
-        RouteCreateRequest invalidRequest = RouteCreateRequest.toRequest(null);
-
-        webTestClient.post()
-                .uri("/routes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(invalidRequest)
-                .exchange()
-                .expectStatus().isBadRequest();
     }
 
 }

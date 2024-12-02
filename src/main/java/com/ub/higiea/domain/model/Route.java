@@ -19,7 +19,8 @@ public class Route {
     private Route() {
     }
 
-    private Route(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime, List<Location> routeGeometry) {
+    private Route(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime,
+                  List<Location> routeGeometry) {
         this.id = id;
         this.truck = truck;
         this.sensors = sensors;
@@ -28,7 +29,8 @@ public class Route {
         this.routeGeometry = routeGeometry;
     }
 
-    public static Route create(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime, List<Location> routeGeometry) {
+    public static Route create(String id, Truck truck, List<Sensor> sensors, Double totalDistance, Long estimatedTime,
+                               List<Location> routeGeometry) {
         return new Route(id, truck, sensors, totalDistance, estimatedTime, routeGeometry);
     }
 

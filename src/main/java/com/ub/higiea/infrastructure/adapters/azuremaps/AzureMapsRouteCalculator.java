@@ -12,6 +12,7 @@ import com.ub.higiea.domain.model.Sensor;
 import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class AzureMapsRouteCalculator implements RouteCalculator {
@@ -23,18 +24,20 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
     }
 
     @Override
-    public Mono<RouteCalculationResult> calculateRoute(List<Sensor> sensors) {
+    public Mono<RouteCalculationResult> calculateRoute(Location depotBase, List<Sensor> sensors) {
         return calculateOptimizedRoute(sensors)
                 .map(routeDirections -> {
 
                     List<Sensor> orderedSensors = new ArrayList<>(sensors);
-
+                    // Extract optimized waypoints
                     List<RouteOptimizedWaypoint> optimizedWaypoints = routeDirections.getOptimizedWaypoints();
 
+                    // Iterate over optimized waypoints and place them in the correct order
                     for (RouteOptimizedWaypoint waypoint : optimizedWaypoints) {
                         int providedIndex = waypoint.getProvidedIndex();
                         int optimizedIndex = waypoint.getOptimizedIndex();
 
+                        // Move the sensor from the provided index to the new optimized index
                         Sensor sensorToMove = sensors.get(providedIndex);
                         orderedSensors.set(optimizedIndex, sensorToMove);
                     }
@@ -50,7 +53,6 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                             .flatMap(leg -> leg.getPoints().stream())
                             .toList();
 
-
                     List<Location> routeGeometry = routeGeometryPoints.stream()
                             .map(geoPosition -> Location.create(geoPosition.getLatitude(), geoPosition.getLongitude()))
                             .toList();
@@ -60,15 +62,20 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
     }
 
     private Mono<RouteDirections> calculateOptimizedRoute(List<Sensor> sensors) {
-        List<GeoPosition> coordinates = sensors.stream()
+
+        List<GeoPosition> coordinates = new ArrayList<>(sensors.stream()
                 .map(sensor -> new GeoPosition(
                         sensor.getLocation().getLongitude(),
                         sensor.getLocation().getLatitude()))
-                .toList();
+                .toList());
+
 
         RouteDirectionsOptions options = new RouteDirectionsOptions(coordinates)
                 .setComputeBestWaypointOrder(true)
-                .setRouteType(RouteType.FASTEST);
+                .setTravelMode(TravelMode.TRUCK)
+                .setRouteType(RouteType.SHORTEST)
+                .setRouteRepresentationForBestOrder(RouteRepresentationForBestOrder.SUMMARY_ONLY);
+
 
         return mapsRouteClient.getRouteDirections(options)
                 .flatMap(response -> {

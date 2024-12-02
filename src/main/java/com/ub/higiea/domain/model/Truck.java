@@ -1,25 +1,34 @@
 package com.ub.higiea.domain.model;
 
+import org.springframework.data.annotation.Transient;
+
 public class Truck {
 
     private Long id;
 
     private Route assignedRoute;
 
-    private Truck() {
-    }
+    private final int maxLoadCapacity;
 
-    private Truck(Long id, Route assignedRoute) {
+    private Location depotLocation;
+
+    private Truck(Long id, Route assignedRoute, int maxLoadCapacity, Location depotLocation) {
         this.id = id;
         this.assignedRoute = assignedRoute;
+        this.maxLoadCapacity = maxLoadCapacity;
+        this.depotLocation = depotLocation;
     }
 
-    public static Truck create(Long id) {
-        return new Truck(id, null);
+    public static Truck create(Long id, int maxLoadCapacity, Location depotLocation) {
+        return new Truck(id, null, maxLoadCapacity, depotLocation);
     }
 
     public Long getId() {
         return id;
+    }
+
+    public int getMaxLoadCapacity() {
+        return maxLoadCapacity;
     }
 
     public Route getAssignedRoute() {
@@ -42,6 +51,10 @@ public class Truck {
 
     public boolean hasAssignedRoute() {
         return this.assignedRoute != null;
+    }
+
+    public Location getDepotLocation() {
+        return depotLocation;
     }
 
 }

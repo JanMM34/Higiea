@@ -1,23 +1,20 @@
 package com.ub.higiea.application.requests;
 
 import com.ub.higiea.domain.model.ContainerState;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import org.springframework.data.geo.Point;
 import org.springframework.data.relational.core.mapping.Column;
 
 public class SensorCreateRequest {
 
     @NotNull(message = "Latitude cannot be null")
-    @Min(-90)
-    @Max(90)
+    @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
+    @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
     private Double latitude;
 
     @NotNull(message = "Longitude cannot be null")
-    @Min(-180)
-    @Max(180)
+    @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
+    @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
 
     @NotNull(message = "Container state cannot be null")

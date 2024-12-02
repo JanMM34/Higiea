@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.persistence.entities;
 
+import com.ub.higiea.domain.model.Truck;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,24 +19,24 @@ public class RouteEntity {
     @Id
     private String id;
 
-    private Long truckId;
+    private Truck truck;
 
     private String type = "FeatureCollection";
 
     private List<Feature> features;
 
-    public RouteEntity(String id, Long truckId, List<Feature> features) {
+    public RouteEntity(String id, Truck truck, List<Feature> features) {
         this.id = id;
         this.features = features;
-        this.truckId = truckId;
+        this.truck = truck;
     }
 
     public String getId() {
         return this.id;
     }
 
-    public Long getTruckId() {
-        return this.truckId;
+    public Truck getTruck() {
+        return this.truck;
     }
 
     public String getType() {

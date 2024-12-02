@@ -13,6 +13,14 @@ public class TruckEntity {
     @Column("route")
     private String routeId;
 
+    @Column("max_load_capacity")
+    private int maxLoadCapacity;
+
+    @Column("depot_latitude")
+    private Double depotLatitude;
+
+    @Column("depot_longitude")
+    private Double depotLongitude;
 
     public TruckEntity() {
     }
@@ -35,6 +43,30 @@ public class TruckEntity {
 
     public boolean isAvailable() {
         return this.routeId == null || this.routeId.isEmpty();
+    }
+
+    public int getMaxLoadCapacity() {
+        return this.maxLoadCapacity;
+    }
+
+    public Double getDepotLatitude() {
+        return depotLatitude;
+    }
+
+    public Double getDepotLongitude() {
+        return depotLongitude;
+    }
+
+    public void setMaxLoadCapacity(int maxLoadCapacity) {
+        this.maxLoadCapacity = maxLoadCapacity;
+    }
+
+    public void setDepotLatitude(Double depotLatitude) {
+        this.depotLatitude = depotLatitude;
+    }
+
+    public void setDepotLongitude(Double depotLongitude) {
+        this.depotLongitude = depotLongitude;
     }
 
 }
