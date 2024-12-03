@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.controller;
 
+import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.services.MessageService;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
@@ -40,19 +41,19 @@ public class RouteControllerTest {
 
         Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
         Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 500.0, 100L, List.of(Location.create(30.0, 60.0), Location.create(20.0, 10.0)));
-        RouteDTO routeDTO1 = RouteDTO.fromRoute(route1);
-        RouteDTO routeDTO2 = RouteDTO.fromRoute(route2);
+        RouteSummaryDTO summaryDTO1 = RouteSummaryDTO.fromRoute(route1);
+        RouteSummaryDTO summaryDTO2 = RouteSummaryDTO.fromRoute(route2);
 
-        Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.just(routeDTO1, routeDTO2));
-        String expectedGeoJSON = GeoJsonUtils.combineRoutes(List.of(routeDTO1.toGeoJSON(), routeDTO2.toGeoJSON()));
+
+        Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.just(summaryDTO1, summaryDTO2));
 
         webTestClient.get()
                 .uri("/routes")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class)
-                .isEqualTo(expectedGeoJSON);
+                .expectBodyList(RouteSummaryDTO.class)
+                .contains(summaryDTO1, summaryDTO2);
     }
 
     @Test
@@ -65,8 +66,8 @@ public class RouteControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class)
-                .isEqualTo(expectedGeoJSON);
+                .expectBodyList(RouteSummaryDTO.class)
+                .hasSize(0);
     }
 
     @Test

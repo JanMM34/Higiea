@@ -73,8 +73,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
         RouteDirectionsOptions options = new RouteDirectionsOptions(coordinates)
                 .setComputeBestWaypointOrder(true)
                 .setTravelMode(TravelMode.TRUCK)
-                .setRouteType(RouteType.SHORTEST)
-                .setRouteRepresentationForBestOrder(RouteRepresentationForBestOrder.SUMMARY_ONLY);
+                .setRouteType(RouteType.SHORTEST);
 
 
         return mapsRouteClient.getRouteDirections(options)

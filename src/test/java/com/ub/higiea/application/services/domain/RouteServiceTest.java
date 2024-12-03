@@ -1,6 +1,7 @@
 package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.RouteDTO;
+import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.application.utils.RouteCalculationResult;
@@ -46,8 +47,8 @@ public class RouteServiceTest {
         when(routeRepository.findAll()).thenReturn(Flux.just(route1, route2));
 
         StepVerifier.create(routeService.getAllRoutes())
-                .expectNext(RouteDTO.fromRoute(route1))
-                .expectNext(RouteDTO.fromRoute(route2))
+                .expectNext(RouteSummaryDTO.fromRoute(route1))
+                .expectNext(RouteSummaryDTO.fromRoute(route2))
                 .verifyComplete();
 
         verify(routeRepository, times(1)).findAll();

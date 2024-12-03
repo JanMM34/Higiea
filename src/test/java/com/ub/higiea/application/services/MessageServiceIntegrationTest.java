@@ -98,10 +98,7 @@ public class MessageServiceIntegrationTest {
 
         Mono<Void> result = messageService.handleMessage(sensorId, stateFull);
 
-
-        StepVerifier.create(result)
-                .verifyComplete();
-
+        StepVerifier.create(result).verifyComplete();
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));

@@ -1,5 +1,6 @@
 package com.ub.higiea.application.services.domain;
 
+import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.utils.RouteCalculator;
@@ -27,9 +28,9 @@ public class RouteService {
         this.routeRepository = routeRepository;
     }
 
-    public Flux<RouteDTO> getAllRoutes() {
+    public Flux<RouteSummaryDTO> getAllRoutes() {
         return routeRepository.findAll()
-                .map(RouteDTO::fromRoute);
+                .map(RouteSummaryDTO::fromRoute);
     }
 
     public Mono<RouteDTO> getRouteById(String routeId) {
