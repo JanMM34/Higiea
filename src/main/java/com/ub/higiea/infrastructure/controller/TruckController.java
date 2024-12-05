@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("trucks")
 @Validated
+@CrossOrigin
 public class TruckController {
 
     private final TruckService truckService;

@@ -104,6 +104,26 @@ public class RouteDTO implements Serializable {
         ObjectNode routeGeometryNode = mapper.createObjectNode();
         routeGeometryNode.put("type", "LineString");
 
+        Point depotLocation = this.truck.getDepotLocation();
+
+
+        ObjectNode depotFeature = mapper.createObjectNode();
+        depotFeature.put("type", "Feature");
+
+        ObjectNode depotProperties = mapper.createObjectNode();
+        depotProperties.put("type", "depot");
+        depotFeature.set("properties", depotProperties);
+
+        ObjectNode depotGeometry = mapper.createObjectNode();
+        depotGeometry.put("type", "Point");
+
+        ArrayNode depotCoordinates = mapper.createArrayNode();
+        depotCoordinates.add(depotLocation.getY());
+        depotCoordinates.add(depotLocation.getX());
+        depotGeometry.set("coordinates", depotCoordinates);
+        depotFeature.set("geometry", depotGeometry);
+
+        featuresArray.add(depotFeature);
 
         for (SensorDTO sensor : this.sensors) {
             ObjectNode sensorFeature = mapper.createObjectNode();

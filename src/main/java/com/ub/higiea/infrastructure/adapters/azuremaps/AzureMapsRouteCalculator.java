@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class AzureMapsRouteCalculator implements RouteCalculator {
@@ -25,22 +26,34 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
 
     @Override
     public Mono<RouteCalculationResult> calculateRoute(Location depotBase, List<Sensor> sensors) {
-        return calculateOptimizedRoute(sensors)
+        return calculateOptimizedRoute(depotBase, sensors)
                 .map(routeDirections -> {
 
-                    List<Sensor> orderedSensors = new ArrayList<>(sensors);
+                    // Initialize ordered sensors list with depot base at start and end
+                    List<Sensor> orderedSensors = new ArrayList<>();
+                    orderedSensors.add(null); // Placeholder for depot base at the start
+                    for (int i = 0; i < sensors.size(); i++) {
+                        orderedSensors.add(null); // Initialize with nulls for sensors
+                    }
+                    orderedSensors.add(null); // Placeholder for depot base at the end
+
                     // Extract optimized waypoints
                     List<RouteOptimizedWaypoint> optimizedWaypoints = routeDirections.getOptimizedWaypoints();
 
-                    // Iterate over optimized waypoints and place them in the correct order
+                    // Adjust indices and place sensors in the correct order
                     for (RouteOptimizedWaypoint waypoint : optimizedWaypoints) {
                         int providedIndex = waypoint.getProvidedIndex();
-                        int optimizedIndex = waypoint.getOptimizedIndex();
+                        int optimizedIndex = waypoint.getOptimizedIndex() + 1; // Increment by 1 to account for the origin
 
                         // Move the sensor from the provided index to the new optimized index
                         Sensor sensorToMove = sensors.get(providedIndex);
                         orderedSensors.set(optimizedIndex, sensorToMove);
                     }
+
+                    // Optionally, set the depot base at the start and end if you have a Sensor object for it
+                    // Sensor depotSensor = createDepotSensor(depotBase);
+                    // orderedSensors.set(0, depotSensor);
+                    // orderedSensors.set(orderedSensors.size() - 1, depotSensor);
 
                     Double totalDistance = routeDirections.getRoutes().getFirst().getSummary()
                             .getLengthInMeters().doubleValue();
@@ -51,7 +64,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                     List<GeoPosition> routeGeometryPoints = routeDirections.getRoutes().getFirst()
                             .getLegs().stream()
                             .flatMap(leg -> leg.getPoints().stream())
-                            .toList();
+                            .collect(Collectors.toList());
 
                     List<Location> routeGeometry = routeGeometryPoints.stream()
                             .map(geoPosition -> Location.create(geoPosition.getLatitude(), geoPosition.getLongitude()))
@@ -61,20 +74,27 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
                 });
     }
 
-    private Mono<RouteDirections> calculateOptimizedRoute(List<Sensor> sensors) {
+    private Mono<RouteDirections> calculateOptimizedRoute(Location depotBase, List<Sensor> sensors) {
 
-        List<GeoPosition> coordinates = new ArrayList<>(sensors.stream()
+        List<GeoPosition> coordinates = new ArrayList<>();
+
+        // Add depot base as start point
+        coordinates.add(new GeoPosition(depotBase.getLongitude(), depotBase.getLatitude()));
+
+        // Add sensor locations
+        coordinates.addAll(sensors.stream()
                 .map(sensor -> new GeoPosition(
                         sensor.getLocation().getLongitude(),
                         sensor.getLocation().getLatitude()))
-                .toList());
+                .collect(Collectors.toList()));
 
+        // Add depot base as end point
+        coordinates.add(new GeoPosition(depotBase.getLongitude(), depotBase.getLatitude()));
 
         RouteDirectionsOptions options = new RouteDirectionsOptions(coordinates)
                 .setComputeBestWaypointOrder(true)
                 .setTravelMode(TravelMode.TRUCK)
                 .setRouteType(RouteType.SHORTEST);
-
 
         return mapsRouteClient.getRouteDirections(options)
                 .flatMap(response -> {

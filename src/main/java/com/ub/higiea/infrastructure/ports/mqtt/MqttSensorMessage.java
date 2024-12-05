@@ -5,13 +5,13 @@ public class MqttSensorMessage {
     private Long sensorId;
     private int state;
 
-    private MqttSensorMessage(Long sensorId, int state) {
-        this.sensorId = sensorId;
-        this.state = state;
+    public MqttSensorMessage(){
+
     }
 
-    public static MqttSensorMessage of(Long sensorId, int state) {
-        return new MqttSensorMessage(sensorId, state);
+    public MqttSensorMessage(Long sensorId, int state) {
+        this.sensorId = sensorId;
+        this.state = state;
     }
 
     public Long getSensorId() {

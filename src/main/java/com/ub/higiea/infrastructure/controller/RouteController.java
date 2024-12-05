@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("routes")
 @Validated
+@CrossOrigin
 public class RouteController {
 
     private final RouteService routeService;

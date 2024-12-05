@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("sensors")
 @Validated
+@CrossOrigin
 public class SensorController {
 
     private final SensorService sensorService;

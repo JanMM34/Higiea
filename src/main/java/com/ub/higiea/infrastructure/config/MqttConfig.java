@@ -20,6 +20,16 @@ public class MqttConfig {
     @Value("${mqtt.broker.url}")
     private String brokerUrl;
 
+    @Value("${mqtt.broker.topic}")
+    private String topic;
+
+    @Value("${mqtt.broker.username}")
+    private String username;
+
+    @Value("${mqtt.broker.password}")
+    private String password;
+
+
     public MqttConfig(MqttMessageListener mqttMessageListener) {
         this.mqttMessageListener = mqttMessageListener;
     }
@@ -30,11 +40,14 @@ public class MqttConfig {
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
-        options.setUserName("${MQTT_BROKER_USERNAME}");
-        options.setPassword("${MQTT_BROKER_PASSWORD}".toCharArray());
+        options.setUserName(username);
+        options.setPassword(password.toCharArray());
 
         client.setCallback(mqttMessageListener);
         client.connect(options);
+
+        client.subscribe(topic);
+
     }
 
 }

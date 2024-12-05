@@ -67,4 +67,5 @@ public class TruckService {
     public Mono<Truck> getTruckByIdAsEntity(Long truckId) {
         return truckRepository.findById(truckId).switchIfEmpty(Mono.error(new TruckNotFoundException(truckId)));
     }
+
 }
