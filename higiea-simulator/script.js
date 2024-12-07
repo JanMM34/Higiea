@@ -1,3 +1,5 @@
+import config from './config.js';
+
 // Initialize the map
 const barcelonaBounds = L.latLngBounds(
     [41.2611, 2.0528],
@@ -25,17 +27,18 @@ let mqttClient;
 // MQTT Connection Options
 const mqttOptions = {
     connectTimeout: 4000,
-    clientId: 'webclient_' + Math.random().toString(16).substr(2, 8),
-    // username: 'your_mqtt_username', // Avoid hardcoding credentials
-    // password: 'your_mqtt_password',
+    clientId: 'higiea_simulator' + Math.random().toString(16).substring(2, 8),
+    username: config.MQTT_USERNAME, // Avoid hardcoding credentials
+    password: config.MQTT_PASSWORD,
     keepalive: 60,
     clean: true,
-    reconnectPeriod: 4000, // Auto-reconnect after 4 seconds
+    reconnectPeriod: 4000,
+    protocol: 'mqtt'
 };
 
 // Connect to the MQTT broker over WebSocket
 function connectMqtt() {
-    const brokerUrl = 'ws://localhost:9002'; // WebSocket URL of your MQTT broker
+    const brokerUrl = config.MQTT_BROKER_URL
     mqttClient = mqtt.connect(brokerUrl, mqttOptions);
 
     mqttClient.on('connect', () => {
@@ -87,7 +90,7 @@ truckSelect.addEventListener('change', () => {
 
 // Load sensors from backend and add to map
 function loadSensors() {
-    axios.get('http://localhost:8080/sensors')
+    axios.get(`${config.API_BASE_URL}/sensors`)
         .then(response => {
             const sensors = response.data;
             sensors.forEach(sensor => {
@@ -101,7 +104,7 @@ function loadSensors() {
 
 // Load trucks from backend and populate the dropdown
 function loadTrucks() {
-    axios.get('http://localhost:8080/trucks')
+    axios.get(`${config.API_BASE_URL}/trucks`)
         .then(response => {
             const trucks = response.data;
             populateTruckDropdown(trucks);
@@ -216,22 +219,6 @@ function clearSensorMarkers() {
     }
     sensorMarkers = {};
 }
-
-// Create popup content with update button
-function createSensorPopupContent(sensorId, containerState) {
-    return `
-        <div class="sensor-popup">
-            <strong>Sensor ID:</strong> ${sensorId}<br>
-            <strong>Current State:</strong> ${containerState}<br>
-            <div class="state-buttons">
-                <button onclick="updateSensorState(${sensorId}, 0)">Set to EMPTY</button>
-                <button onclick="updateSensorState(${sensorId}, 50)">Set to HALF</button>
-                <button onclick="updateSensorState(${sensorId}, 80)">Set to FULL</button>
-            </div>
-        </div>
-    `;
-}
-
 // Update sensor state via MQTT message
 function updateSensorState(sensorId, newState) {
     // Create the MQTT message payload
@@ -254,6 +241,21 @@ function updateSensorState(sensorId, newState) {
     });
 }
 
+// Create popup content with update button
+function createSensorPopupContent(sensorId, containerState) {
+    return `
+        <div class="sensor-popup">
+            <strong>Sensor ID:</strong> ${sensorId}<br>
+            <strong>Current State:</strong> ${containerState}<br>
+            <div class="state-buttons">
+                <button onclick="updateSensorState(${sensorId}, 0)">Set to EMPTY</button>
+                <button onclick="updateSensorState(${sensorId}, 50)">Set to HALF</button>
+                <button onclick="updateSensorState(${sensorId}, 80)">Set to FULL</button>
+            </div>
+        </div>
+    `;
+}
+
 // Handle map click event for adding new sensors
 function onMapClick(e) {
     if (!isAddingSensor) return;
@@ -268,7 +270,7 @@ function onMapClick(e) {
     };
 
     // Send POST request to create a new sensor
-    axios.post('http://localhost:8080/sensors', newSensor)
+    axios.post(`${config.API_BASE_URL}/sensors`, newSensor)
         .then(response => {
             const createdSensor = response.data;
             addSensorMarker(createdSensor);
@@ -283,7 +285,7 @@ function onMapClick(e) {
 
 // Fetch and display route by ID
 function fetchAndDisplayRoute(routeId) {
-    axios.get(`http://localhost:8080/routes/${routeId}`)
+    axios.get(`${config.API_BASE_URL}/routes/${routeId}`)
         .then(response => {
             const geoJson = response.data;
             displayRouteOnMap(geoJson);
@@ -397,3 +399,5 @@ function clearTruckMarker() {
         map.truckMarker = null;
     }
 }
+
+window.updateSensorState = updateSensorState;

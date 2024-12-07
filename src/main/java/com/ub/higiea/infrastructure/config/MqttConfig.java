@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +15,6 @@ public class MqttConfig {
     private final MqttMessageListener mqttMessageListener;
     private MqttClient client;
 
-    @Value("${mqtt.broker.clientId}")
     private String clientId;
 
     @Value("${mqtt.broker.url}")
@@ -29,25 +29,33 @@ public class MqttConfig {
     @Value("${mqtt.broker.password}")
     private String password;
 
+    MemoryPersistence persistence;
 
     public MqttConfig(MqttMessageListener mqttMessageListener) {
         this.mqttMessageListener = mqttMessageListener;
+        this.clientId = MqttClient.generateClientId();
+        persistence = new MemoryPersistence();
     }
 
     @PostConstruct
-    public void connect() throws MqttException {
-        client = new MqttClient(brokerUrl, clientId);
+    public void connect() {
+        try {
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setCleanSession(true);
-        options.setUserName(username);
-        options.setPassword(password.toCharArray());
+            client = new MqttClient(brokerUrl, clientId, persistence);
 
-        client.setCallback(mqttMessageListener);
-        client.connect(options);
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setCleanSession(true);
+            options.setUserName(username);
+            options.setPassword(password.toCharArray());
 
-        client.subscribe(topic);
+            client.setCallback(mqttMessageListener);
+            client.connect(options);
+            client.subscribe(topic);
 
+        } catch (MqttException e) {
+            e.printStackTrace();
+            System.err.println("Failed to connect to the broker: " + e.getMessage());
+        }
     }
 
 }
