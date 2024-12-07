@@ -33,4 +33,5 @@ public class RouteCalculationResult {
     public List<Location> getRouteGeometry() {
         return routeGeometry;
     }
+
 }

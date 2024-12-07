@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.controller;
 
+import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.services.MessageService;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
@@ -13,11 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("routes")
 @Validated
+@CrossOrigin
 public class RouteController {
 
     private final RouteService routeService;
@@ -29,11 +32,8 @@ public class RouteController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> getAllRoutes() {
-        return routeService.getAllRoutes()
-                .map(RouteDTO::toGeoJSON)
-                .collectList()
-                .map(GeoJsonUtils::combineRoutes);
+    public Flux<RouteSummaryDTO> getAllRoutes() {
+        return routeService.getAllRoutes();
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
