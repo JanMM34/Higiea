@@ -1,7 +1,7 @@
 package com.ub.higiea.infrastructure.controller;
 
 import com.ub.higiea.application.dtos.SensorDTO;
-import com.ub.higiea.application.domainservice.SensorService;
+import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
 import jakarta.validation.Valid;
@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("sensors")
 @Validated
+@CrossOrigin
 public class SensorController {
 
     private final SensorService sensorService;

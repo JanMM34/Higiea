@@ -1,10 +1,9 @@
 package com.ub.higiea.infrastructure.controller;
 
-import com.ub.higiea.application.domainservice.TruckService;
-import com.ub.higiea.application.dtos.SensorDTO;
+import com.ub.higiea.application.requests.TruckCreateRequest;
+import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.application.dtos.TruckDTO;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
-import com.ub.higiea.application.requests.SensorCreateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("trucks")
 @Validated
+@CrossOrigin
 public class TruckController {
 
     private final TruckService truckService;
@@ -39,8 +39,8 @@ public class TruckController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<TruckDTO> createTruck() {
-        return truckService.createTruck()
+    public Mono<TruckDTO> createTruck(@Valid @RequestBody TruckCreateRequest truckCreateRequest) {
+        return truckService.createTruck(truckCreateRequest)
                 .onErrorMap(ValidationException.class, ex -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ex.getMessage(), ex));
     }

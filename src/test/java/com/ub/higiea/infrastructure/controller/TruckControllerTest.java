@@ -1,8 +1,10 @@
 package com.ub.higiea.infrastructure.controller;
 
-import com.ub.higiea.application.domainservice.TruckService;
+import com.ub.higiea.application.requests.TruckCreateRequest;
+import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.application.dtos.TruckDTO;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
+import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Truck;
 
 import org.junit.jupiter.api.Test;
@@ -26,9 +28,8 @@ public class TruckControllerTest {
 
     @Test
     void getAllTrucks_ShouldReturnListOfTruckDTOs() {
-
-        Truck truck1 = Truck.create(1L);
-        Truck truck2 = Truck.create(2L);
+        Truck truck1 = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Truck truck2 = Truck.create(2L, 20, Location.create(30.0, 40.0));
 
         TruckDTO truckDTO1 = TruckDTO.fromTruck(truck1);
         TruckDTO truckDTO2 = TruckDTO.fromTruck(truck2);
@@ -45,13 +46,11 @@ public class TruckControllerTest {
     }
 
     @Test
-    void gettruckById_ShouldReturntruckDTO_WhentruckExists() {
+    void getTruckById_ShouldReturnTruckDTO_WhenTruckExists() {
+        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        TruckDTO expectedTruckDTO = TruckDTO.fromTruck(truck);
 
-        Truck truck = Truck.create(1L);
-
-        TruckDTO expectedtruckDTO = TruckDTO.fromTruck(truck);
-
-        Mockito.when(truckService.getTruckById(1L)).thenReturn(Mono.just(expectedtruckDTO));
+        Mockito.when(truckService.getTruckById(1L)).thenReturn(Mono.just(expectedTruckDTO));
 
         webTestClient.get()
                 .uri("/trucks/{id}", 1L)
@@ -60,20 +59,22 @@ public class TruckControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(TruckDTO.class)
-                .isEqualTo(expectedtruckDTO);
+                .isEqualTo(expectedTruckDTO);
     }
 
     @Test
     void createTruck_ShouldReturnCreatedTruckDTO() {
-
-        Truck truck = Truck.create(1L);
+        TruckCreateRequest truckCreateRequest = TruckCreateRequest.toRequest(10.0, 20.0, 15);
+        Truck truck = Truck.create(1L, truckCreateRequest.getMaxLoadCapacity(),
+                Location.create(truckCreateRequest.getLatitude(), truckCreateRequest.getLongitude()));
         TruckDTO truckDTO = TruckDTO.fromTruck(truck);
 
-        Mockito.when(truckService.createTruck()).thenReturn(Mono.just(truckDTO));
+        Mockito.when(truckService.createTruck(Mockito.any(TruckCreateRequest.class))).thenReturn(Mono.just(truckDTO));
 
         webTestClient.post()
                 .uri("/trucks")
                 .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(truckCreateRequest)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -82,7 +83,7 @@ public class TruckControllerTest {
     }
 
     @Test
-    void gettruckById_ShouldReturnNotFound_WhentruckNotFound() {
+    void getTruckById_ShouldReturnNotFound_WhenTruckNotFound() {
         Long truckId = 1L;
         Mockito.when(truckService.getTruckById(truckId))
                 .thenReturn(Mono.error(new TruckNotFoundException(truckId)));

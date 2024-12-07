@@ -12,4 +12,6 @@ public interface RouteRepository {
 
     Mono<Route> save(Route route);
 
+    Mono<Void> deleteById(String id);
+
 }

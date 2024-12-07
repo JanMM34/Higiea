@@ -1,5 +1,6 @@
 package com.ub.higiea.infrastructure.persistence.entities;
 
+import com.ub.higiea.domain.model.ContainerState;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;

@@ -1,6 +1,7 @@
 package com.ub.higiea.infrastructure.config;
 
 
+import com.azure.identity.AzureCliCredentialBuilder;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.maps.route.MapsRouteAsyncClient;
 import com.azure.maps.route.MapsRouteClientBuilder;
@@ -17,7 +18,7 @@ public class AzureMapsConfig {
     @Bean
     public MapsRouteAsyncClient mapsRouteAsyncClient() {
         return new MapsRouteClientBuilder()
-                .credential(new DefaultAzureCredentialBuilder().build())
+                .credential(new AzureCliCredentialBuilder().build())
                 .mapsClientId(mapsClientId)
                 .buildAsyncClient();
     }
