@@ -5,7 +5,8 @@ CREATE TABLE sensor (
     id SERIAL PRIMARY KEY,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
-    state VARCHAR(255) NOT NULL
+    state VARCHAR(255) NOT NULL,
+    assigned_to_route BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE truck (

@@ -8,11 +8,15 @@ import com.ub.higiea.infrastructure.persistence.entities.SensorEntity;
 public class SensorMapper {
 
     public static Sensor toDomain(SensorEntity entity) {
-        return Sensor.create(
+        Sensor sensor = Sensor.create(
                 entity.getId(),
                 Location.create(entity.getLatitude(), entity.getLongitude()),
                 ContainerState.valueOf(entity.getContainerState())
         );
+        if (entity.isAssignedToRoute()) {
+            sensor.markAssignedToRoute();
+        }
+        return sensor;
     }
 
     public static SensorEntity toEntity(Sensor sensor) {
@@ -24,6 +28,7 @@ public class SensorMapper {
         if (sensor.getId() != null) {
             entity.setId(sensor.getId());
         }
+        entity.setAssignedToRoute(sensor.isAssignedToRoute());
         return entity;
     }
 

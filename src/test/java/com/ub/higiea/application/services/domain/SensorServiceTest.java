@@ -114,9 +114,9 @@ public class SensorServiceTest {
         Sensor sensorFull2 = Sensor.create(4L, Location.create(25.0, 35.0), ContainerState.FULL);
         Sensor sensorHalf2 = Sensor.create(5L, Location.create(30.0, 40.0), ContainerState.HALF);
 
-        List<Sensor> allSensors = Arrays.asList(sensorFull1, sensorHalf1, sensorEmpty1, sensorEmpty2, sensorFull2, sensorHalf2);
+        when(sensorRepository.findRelevantSensors(capacity))
+                .thenReturn(Flux.just(sensorFull1, sensorFull2, sensorHalf1, sensorHalf2));
 
-        when(sensorRepository.findAll()).thenReturn(Flux.fromIterable(allSensors));
 
         Flux<Sensor> result = sensorService.fetchRelevantSensors(capacity);
 
@@ -127,7 +127,7 @@ public class SensorServiceTest {
                 .expectNext(sensorHalf2)
                 .verifyComplete();
 
-        verify(sensorRepository, times(1)).findAll();
+        verify(sensorRepository, times(1)).findRelevantSensors(capacity);
     }
 
 }

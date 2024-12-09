@@ -62,10 +62,12 @@ public class SensorService {
     }
 
     public Flux<Sensor> fetchRelevantSensors(int capacity) {
-        return sensorRepository.findAll()
-                .filter(sensor -> sensor.getContainerState() != ContainerState.EMPTY)
-                .sort(Comparator.comparingInt(sensor -> -sensor.getContainerState().getLevel()))
-                .take(capacity);
+        return sensorRepository.findRelevantSensors(capacity);
+    }
+
+    public Mono<Void> saveAll(List<Sensor> sensors) {
+        return sensorRepository.saveAll(sensors)
+                .then();
     }
 
 }
