@@ -76,7 +76,6 @@ truckSelect.addEventListener('change', () => {
     // Clear existing route and truck markers
     clearExistingRoute();
     clearTruckMarker();
-    clearSensorMarkers();
 
     if (routeId && routeId !== 'null') {
         fetchAndDisplayRoute(routeId);

@@ -46,5 +46,10 @@ public class SensorRepositoryImpl implements SensorRepository {
                 .map(SensorMapper::toDomain);
     }
 
+    @Override
+    public Flux<Sensor> findRelevantSensors(int capacity) {
+        return sensorEntityRepository.findRelevantSensors(capacity)
+                .map(SensorMapper::toDomain);
+    }
 
 }

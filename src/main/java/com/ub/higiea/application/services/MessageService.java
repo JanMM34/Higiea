@@ -50,9 +50,10 @@ public class MessageService {
                             Truck assignedTruck = tuple.getT1();
                             Route route = tuple.getT2();
 
-                            sensors.forEach(Sensor::markAssignedToRoute);
-                            return sensorService.saveAll(sensors)
-                                    .then(truckService.assignRouteToTruck(assignedTruck, route));
+                            return Mono.when(
+                                    sensorService.saveAll(sensors),
+                                    truckService.assignRouteToTruck(assignedTruck, route)
+                            );
                         }))
                 ).then();
     }

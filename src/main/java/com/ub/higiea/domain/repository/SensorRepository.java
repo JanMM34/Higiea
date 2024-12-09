@@ -15,4 +15,7 @@ public interface SensorRepository {
     Mono<Sensor> save(Sensor sensor);
 
     Flux<Sensor> saveAll(List<Sensor> sensors);
+
+    Flux<Sensor> findRelevantSensors(int capacity);
+
 }
