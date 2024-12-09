@@ -5,7 +5,6 @@ import com.ub.higiea.application.services.MessageService;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
-import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.domain.model.*;
 import com.ub.higiea.infrastructure.utils.GeoJsonUtils;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @WebFluxTest(controllers = RouteController.class)
 public class RouteControllerTest {
@@ -35,8 +35,8 @@ public class RouteControllerTest {
     @Test
     void getAllRoutes_ShouldReturnCombinedGeoJSON_WhenRoutesExist() {
 
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.FULL);
+        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 60.0), ContainerState.FULL);
         Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
 
         Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
@@ -73,8 +73,8 @@ public class RouteControllerTest {
     @Test
     void getRouteById_ShouldReturnGeoJSON_WhenRouteExists() {
 
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 60.0), ContainerState.FULL);
+        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 60.0), ContainerState.FULL);
         Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
 
         Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));

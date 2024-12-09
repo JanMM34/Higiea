@@ -17,8 +17,7 @@ public class MockRouteCalculatorImpl implements RouteCalculator {
     public Mono<RouteCalculationResult> calculateRoute(Location depotBase,List<Sensor> sensors) {
 
         List<Sensor> orderedSensors = sensors.stream()
-                .sorted(Comparator.comparingLong(Sensor::getId))
-                .collect(Collectors.toList());
+                .toList();
 
 
         double totalDistance = 10.0;

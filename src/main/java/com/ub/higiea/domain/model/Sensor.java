@@ -1,8 +1,10 @@
 package com.ub.higiea.domain.model;
 
+import java.util.UUID;
+
 public class Sensor {
 
-    private Long id;
+    private UUID id;
 
     private Location location;
 
@@ -13,18 +15,18 @@ public class Sensor {
     private Sensor() {
     }
 
-    private Sensor(Long id, Location location, ContainerState containerState) {
+    private Sensor(UUID id, Location location, ContainerState containerState) {
         this.id = id;
         this.location = location;
         this.containerState = containerState;
         this.assignedToRoute = false;
     }
 
-    public static Sensor create(Long id, Location location, ContainerState containerState) {
+    public static Sensor create(UUID id, Location location, ContainerState containerState) {
         return new Sensor(id, location, containerState);
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

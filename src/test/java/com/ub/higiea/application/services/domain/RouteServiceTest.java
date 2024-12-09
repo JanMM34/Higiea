@@ -22,6 +22,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 public class RouteServiceTest {
 
@@ -37,8 +39,8 @@ public class RouteServiceTest {
     @Test
     void getAllRoutes_ShouldReturnAllRouteDTOs_WhenRepositoryNotEmpty() {
         Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 20.0), ContainerState.FULL);
+        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 20.0), ContainerState.FULL);
         Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L,
                 List.of(Location.create(20.0, 10.0), Location.create(30.0, 20.0)));
         Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 200.0, 70L,
@@ -68,7 +70,7 @@ public class RouteServiceTest {
     void getRouteById_ShouldReturnRouteDTO_WhenRouteFound() {
         String routeId = "1";
         Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
         Route route = Route.create(routeId, truck, List.of(sensor1), 100.0, 50L, List.of(Location.create(20.0, 10.0)));
 
         when(routeRepository.findById(routeId)).thenReturn(Mono.just(route));
@@ -95,8 +97,8 @@ public class RouteServiceTest {
     @Test
     void calculateAndSaveRoute_ShouldReturnSavedRoute_WhenValidInput() {
         Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
-        Sensor sensor1 = Sensor.create(1L, Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(2L, Location.create(30.0, 20.0), ContainerState.FULL);
+        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
+        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 20.0), ContainerState.FULL);
         List<Sensor> sensors = List.of(sensor1, sensor2);
 
         RouteCalculationResult calculationResult = new RouteCalculationResult(

@@ -2,14 +2,12 @@ package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
-import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.utils.RouteCalculator;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.Truck;
 import com.ub.higiea.domain.repository.RouteRepository;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

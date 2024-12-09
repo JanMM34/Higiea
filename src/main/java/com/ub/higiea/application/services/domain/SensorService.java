@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SensorService {
@@ -28,13 +29,13 @@ public class SensorService {
                 .map(SensorDTO::fromSensor);
     }
 
-    public Mono<SensorDTO> getSensorById(Long id) {
+    public Mono<SensorDTO> getSensorById(UUID id) {
         return sensorRepository.findById(id)
                 .switchIfEmpty(Mono.error(new SensorNotFoundException(id)))
                 .map(SensorDTO::fromSensor);
     }
 
-    public Flux<Sensor> getSensorsByIds(List<Long> ids) {
+    public Flux<Sensor> getSensorsByIds(List<UUID> ids) {
         return Flux.fromIterable(ids)
                 .flatMap(
                         id -> sensorRepository.findById(id)
@@ -44,7 +45,7 @@ public class SensorService {
 
     public Mono<SensorDTO> createSensor(SensorCreateRequest request) {
         Sensor sensor = Sensor.create(
-                null,
+                UUID.randomUUID(),
                 Location.create(request.getLatitude(), request.getLongitude()),
                 ContainerState.valueOf(request.getContainerState())
         );
@@ -52,7 +53,7 @@ public class SensorService {
                 .map(SensorDTO::fromSensor);
     }
 
-    public Mono<Sensor> updateSensorState(Long sensorId, int state) {
+    public Mono<Sensor> updateSensorState(UUID sensorId, int state) {
         return sensorRepository.findById(sensorId)
                 .switchIfEmpty(Mono.error(new SensorNotFoundException(sensorId)))
                 .flatMap(sensor -> {

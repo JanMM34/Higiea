@@ -1,15 +1,16 @@
 package com.ub.higiea.infrastructure.persistence.entities;
 
-import com.ub.higiea.domain.model.ContainerState;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;
+
+import java.util.UUID;
 
 @Table("sensor")
 public class SensorEntity {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @Column("latitude")
     private Double latitude;
@@ -26,13 +27,14 @@ public class SensorEntity {
     public SensorEntity() {
     }
 
-    public SensorEntity(Double latitude, Double longitude, String containerState) {
+    public SensorEntity(UUID uuid,Double latitude, Double longitude, String containerState) {
+        this.id = uuid;
         this.latitude = latitude;
         this.longitude = longitude;
         this.containerState = containerState;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -48,7 +50,7 @@ public class SensorEntity {
         return containerState;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

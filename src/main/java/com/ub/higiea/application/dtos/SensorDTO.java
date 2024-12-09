@@ -5,16 +5,17 @@ import com.ub.higiea.domain.model.ContainerState;
 import org.springframework.data.geo.Point;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 public class SensorDTO implements Serializable {
 
-    private final Long id;
+    private final UUID id;
 
     private final Point location;
 
     private final ContainerState containerState;
 
-    private SensorDTO(Long id, Point location, ContainerState containerState) {
+    private SensorDTO(UUID id, Point location, ContainerState containerState) {
         this.id = id;
         this.location = location;
         this.containerState = containerState;
@@ -28,7 +29,7 @@ public class SensorDTO implements Serializable {
         );
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

@@ -9,6 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class SensorRepositoryImpl implements SensorRepository {
@@ -20,7 +21,7 @@ public class SensorRepositoryImpl implements SensorRepository {
     }
 
     @Override
-    public Mono<Sensor> findById(Long id) {
+    public Mono<Sensor> findById(UUID id) {
         return sensorEntityRepository.findById(id)
                 .map(SensorMapper::toDomain);
     }

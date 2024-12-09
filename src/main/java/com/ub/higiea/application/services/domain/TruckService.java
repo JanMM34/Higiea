@@ -1,9 +1,7 @@
 package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.TruckDTO;
-import com.ub.higiea.application.exception.notfound.NotFoundException;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
-import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.requests.TruckCreateRequest;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Route;

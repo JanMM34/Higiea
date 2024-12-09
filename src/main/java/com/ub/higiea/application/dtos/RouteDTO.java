@@ -130,7 +130,7 @@ public class RouteDTO implements Serializable {
             sensorFeature.put("type", "Feature");
 
             ObjectNode sensorProperties = mapper.createObjectNode();
-            sensorProperties.put("sensorId", sensor.getId());
+            sensorProperties.put("sensorId", sensor.getId().toString());
             sensorProperties.put("containerState", sensor.getContainerState().name());
             sensorFeature.set("properties", sensorProperties);
 

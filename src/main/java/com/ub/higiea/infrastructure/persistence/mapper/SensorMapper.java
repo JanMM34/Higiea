@@ -21,13 +21,11 @@ public class SensorMapper {
 
     public static SensorEntity toEntity(Sensor sensor) {
         SensorEntity entity = new SensorEntity(
+                sensor.getId(),
                 sensor.getLocation().getLatitude(),
                 sensor.getLocation().getLongitude(),
                 sensor.getContainerState().toString()
         );
-        if (sensor.getId() != null) {
-            entity.setId(sensor.getId());
-        }
         entity.setAssignedToRoute(sensor.isAssignedToRoute());
         return entity;
     }

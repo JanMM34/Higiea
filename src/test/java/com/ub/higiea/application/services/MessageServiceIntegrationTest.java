@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceIntegrationTest {
@@ -37,30 +38,24 @@ public class MessageServiceIntegrationTest {
     @Mock
     private RouteCalculator routeCalculator;
 
-    private SensorService sensorService;
-    private TruckService truckService;
     private RouteService routeService;
-
 
     private MessageService messageService;
 
     @BeforeEach
     void setUp() {
-
-        sensorService = new SensorService(sensorRepository);
-        truckService = new TruckService(truckRepository);
+        SensorService sensorService = new SensorService(sensorRepository);
+        TruckService truckService = new TruckService(truckRepository);
         routeService = new RouteService(routeCalculator, routeRepository);
-
         messageService = new MessageService(sensorService, routeService, truckService);
     }
 
     @Test
     void handleMessage_FullFlow_Success() {
-        Long sensorId = 1L;
+        UUID sensorId = UUID.randomUUID();
         int stateFull = 80;
 
         Sensor existingSensor = Sensor.create(sensorId, Location.create(10.0, 20.0), ContainerState.EMPTY);
-
         Sensor updatedSensor = Sensor.create(sensorId, Location.create(10.0, 20.0), ContainerState.FULL);
 
         when(sensorRepository.findById(sensorId))
@@ -69,7 +64,7 @@ public class MessageServiceIntegrationTest {
 
         when(sensorRepository.save(any(Sensor.class))).thenReturn(Mono.just(updatedSensor));
 
-        Sensor sensor2 = Sensor.create(2L, Location.create(15.0, 25.0), ContainerState.HALF);
+        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(15.0, 25.0), ContainerState.HALF);
 
         Truck truck = Truck.create(1L, 5, Location.create(30.0, 40.0));
         when(truckRepository.findAll()).thenReturn(Flux.just(truck));
@@ -99,7 +94,6 @@ public class MessageServiceIntegrationTest {
                 calculationResult.getEstimatedTimeInSeconds(), calculationResult.getRouteGeometry());
         when(routeRepository.save(any(Route.class))).thenReturn(Mono.just(route));
 
-
         Mono<Void> result = messageService.handleMessage(sensorId, stateFull);
 
         StepVerifier.create(result).verifyComplete();
@@ -112,13 +106,11 @@ public class MessageServiceIntegrationTest {
         verify(routeRepository, times(1)).save(any(Route.class));
         verify(truckRepository, times(1)).save(any(Truck.class));
         verify(sensorRepository, times(1)).saveAll(anyList());
-
     }
 
     @Test
     void handleMessage_NoTruckAvailable_ShouldCompleteWithoutErrors() {
-
-        Long sensorId = 1L;
+        UUID sensorId = UUID.randomUUID();
         int state = 80;
 
         Sensor existingSensor = Sensor.create(sensorId, Location.create(10.0, 20.0), ContainerState.EMPTY);
@@ -130,22 +122,16 @@ public class MessageServiceIntegrationTest {
 
         when(sensorRepository.save(any(Sensor.class))).thenReturn(Mono.just(updatedSensor));
 
-
         when(truckRepository.findAll()).thenReturn(Flux.empty());
-
 
         Mono<Void> result = messageService.handleMessage(sensorId, state);
 
-
         StepVerifier.create(result)
                 .verifyComplete();
-
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
         verify(truckRepository, times(1)).findAll();
         verifyNoMoreInteractions(sensorRepository, truckRepository, routeRepository, routeCalculator);
-
     }
-
 }

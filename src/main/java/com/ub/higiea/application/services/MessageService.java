@@ -1,7 +1,6 @@
 package com.ub.higiea.application.services;
 
 import com.ub.higiea.application.dtos.RouteDTO;
-import com.ub.higiea.application.requests.RouteCreateRequest;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
@@ -13,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class MessageService {
@@ -27,7 +27,7 @@ public class MessageService {
         this.truckService = truckService;
     }
 
-    public Mono<Void> handleMessage(Long sensorId, int state) {
+    public Mono<Void> handleMessage(UUID sensorId, int state) {
         return Mono.defer(() ->
                 sensorService.updateSensorState(sensorId, state)
                         .flatMap(sensor -> {
@@ -56,20 +56,6 @@ public class MessageService {
                             );
                         }))
                 ).then();
-    }
-
-    public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
-        Mono<Truck> truckMono = truckService.getTruckByIdAsEntity(request.getTruckId());
-        Flux<Sensor> sensorsFlux = sensorService.getSensorsByIds(request.getSensorIds());
-
-        return Mono.zip(truckMono, sensorsFlux.collectList())
-                .flatMap(tuple -> {
-                    Truck truck = tuple.getT1();
-                    List<Sensor> sensors = tuple.getT2();
-                    return routeService.calculateAndSaveRoute(truck, sensors)
-                            .flatMap(route -> truckService.assignRouteToTruck(truck, route)
-                                    .thenReturn(RouteDTO.fromRoute(route)));
-                });
     }
 
 }
