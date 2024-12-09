@@ -167,58 +167,55 @@ function addSensorMarker(sensor) {
         popupAnchor: [0, -6],
     });
 
+
+
     // Add marker to the map
-    return L.marker([latitude, longitude], {icon: sensorIcon})
+    const marker = L.marker([latitude, longitude], {icon: sensorIcon})
         .addTo(map)
         .bindPopup(createSensorPopupContent(id, containerState));
+
+    sensorMarkers[id] = marker;
+
+    return marker
 }
 
 function updateSensorMarker(sensorId, newState) {
-    // Find the marker for the sensor
     const marker = sensorMarkers[sensorId];
     if (marker) {
-        // Remove the old marker
-        map.removeLayer(marker);
-
-        // Update the containerState based on newState
-        let containerState;
+        // Determine the new marker color based on state
+        let markerColor;
         switch (parseInt(newState)) {
             case 0:
-                containerState = 'EMPTY';
+                markerColor = 'green';
                 break;
             case 50:
-                containerState = 'HALF';
+                markerColor = 'orange';
                 break;
             case 80:
-                containerState = 'FULL';
+                markerColor = 'red';
                 break;
             default:
-                containerState = 'UNKNOWN';
+                markerColor = 'gray'; // Unknown state
         }
 
-        // Create a new marker with updated state
-        const updatedSensor = {
-            id: sensorId,
-            location: {
-                x: marker.getLatLng().lng,
-                y: marker.getLatLng().lat,
-            },
-            containerState: containerState
-        };
+        // Update marker's icon dynamically
+        const updatedIcon = L.divIcon({
+            className: 'sensor-marker',
+            html: `<div style="background-color: ${markerColor}; width: 14px; height: 14px; border-radius: 50%;"></div>`,
+            iconSize: [14, 14],
+            popupAnchor: [0, -7],
+        });
 
-        const newMarker = addSensorMarker(updatedSensor);
-
-        // Update the sensorMarkers map
-        sensorMarkers[sensorId] = newMarker;
+        marker.setIcon(updatedIcon);
+        marker.bindPopup(`<div class="sensor-popup">
+            <strong>Sensor ID:</strong> ${sensorId}<br>
+            <strong>State:</strong> ${markerColor.toUpperCase()}
+        </div>`);
+    } else {
+        console.warn(`Marker for sensor ${sensorId} not found.`);
     }
 }
 
-function clearSensorMarkers() {
-    for (const sensorId in sensorMarkers) {
-        map.removeLayer(sensorMarkers[sensorId]);
-    }
-    sensorMarkers = {};
-}
 // Update sensor state via MQTT message
 function updateSensorState(sensorId, newState) {
     // Create the MQTT message payload
@@ -234,8 +231,6 @@ function updateSensorState(sensorId, newState) {
             console.error('MQTT publish error:', err);
             alert('Failed to update sensor state.');
         } else {
-            alert('Sensor state updated successfully.');
-            // Update the marker on the map
             updateSensorMarker(sensorId, newState);
         }
     });
@@ -358,7 +353,7 @@ function addSensorMarkerOnRoute(latitude, longitude, properties) {
             markerColor = 'red';
             break;
         case 'HALF':
-            markerColor = 'yellow';
+            markerColor = 'orange';
             break;
         case 'EMPTY':
             markerColor = 'green';

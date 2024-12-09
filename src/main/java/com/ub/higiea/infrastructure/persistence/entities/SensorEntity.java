@@ -20,6 +20,9 @@ public class SensorEntity {
     @Column("state")
     private String containerState;
 
+    @Column("assigned_to_route")
+    private boolean assignedToRoute;
+
     public SensorEntity() {
     }
 
@@ -47,6 +50,14 @@ public class SensorEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isAssignedToRoute() {
+        return assignedToRoute;
+    }
+
+    public void setAssignedToRoute(boolean assignedToRoute) {
+        this.assignedToRoute = assignedToRoute;
     }
 
 }

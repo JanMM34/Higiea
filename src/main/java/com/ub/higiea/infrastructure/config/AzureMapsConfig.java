@@ -18,7 +18,7 @@ public class AzureMapsConfig {
     @Bean
     public MapsRouteAsyncClient mapsRouteAsyncClient() {
         return new MapsRouteClientBuilder()
-                .credential(new AzureCliCredentialBuilder().build())
+                .credential(new DefaultAzureCredentialBuilder().build())
                 .mapsClientId(mapsClientId)
                 .buildAsyncClient();
     }
