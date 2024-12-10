@@ -5,15 +5,18 @@ import org.springframework.data.geo.Point;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 public class TruckDTO implements Serializable {
 
+    private final UUID id;
     private final String plate;
     private final String routeId;
     private final int maxLoadCapacity;
     private final Point depotLocation;
 
-    private TruckDTO(String plate, String routeId, int maxLoadCapacity, Point depotLocation) {
+    private TruckDTO(UUID id,String plate, String routeId, int maxLoadCapacity, Point depotLocation) {
+        this.id = id;
         this.plate = plate;
         this.routeId = routeId;
         this.maxLoadCapacity = maxLoadCapacity;
@@ -24,6 +27,7 @@ public class TruckDTO implements Serializable {
         String routeId = truck.hasAssignedRoute() ? truck.getAssignedRoute().getId() : null;
 
         return new TruckDTO(
+                truck.getId(),
                 truck.getPlate(),
                 routeId,
                 truck.getMaxLoadCapacity(),
@@ -32,6 +36,10 @@ public class TruckDTO implements Serializable {
                         truck.getDepotLocation().getLongitude()
                 )
         );
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getPlate() {

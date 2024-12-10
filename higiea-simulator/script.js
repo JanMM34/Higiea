@@ -1,5 +1,28 @@
 import config from './config.js';
 
+let selectedZone = 'all'; // Default to all
+const zoneSelect = document.getElementById('zoneSelect');
+
+zoneSelect.addEventListener('change', () => {
+    selectedZone = zoneSelect.value;
+    const zoneBaseUrl = config.ZONES[selectedZone];
+
+    // Disable "Add New Sensor" button if "All" is selected
+    addSensorBtn.disabled = (selectedZone === 'all');
+
+    // Clear existing markers
+    clearExistingRoute();
+    clearTruckMarker();
+    Object.values(sensorMarkers).forEach(marker => map.removeLayer(marker));
+    sensorMarkers = {};
+
+    // Reload data based on selected zone
+    if (selectedZone !== 'all') {
+        loadSensors(zoneBaseUrl);
+        loadTrucks(zoneBaseUrl);
+    }
+});
+
 // Initialize the map
 const barcelonaBounds = L.latLngBounds(
     [41.2611, 2.0528],
@@ -54,8 +77,11 @@ function connectMqtt() {
 connectMqtt();
 
 // Load sensors and trucks
-loadSensors();
-loadTrucks();
+if (selectedZone !== 'all') {
+    const baseUrl = config.ZONES[selectedZone];
+    loadSensors(baseUrl);
+    loadTrucks(baseUrl);
+}
 
 // Event listeners
 addSensorBtn.addEventListener('click', () => {
@@ -88,8 +114,8 @@ truckSelect.addEventListener('change', () => {
 // Functions
 
 // Load sensors from backend and add to map
-function loadSensors() {
-    axios.get(`${config.API_BASE_URL}/sensors`)
+function loadSensors(baseUrl) {
+    axios.get(`${baseUrl}/sensors`)
         .then(response => {
             const sensors = response.data;
             sensors.forEach(sensor => {
@@ -101,9 +127,8 @@ function loadSensors() {
         });
 }
 
-// Load trucks from backend and populate the dropdown
-function loadTrucks() {
-    axios.get(`${config.API_BASE_URL}/trucks`)
+function loadTrucks(baseUrl) {
+    axios.get(`${baseUrl}/trucks`)
         .then(response => {
             const trucks = response.data;
             populateTruckDropdown(trucks);
@@ -206,10 +231,7 @@ function updateSensorMarker(sensorId, newState) {
         });
 
         marker.setIcon(updatedIcon);
-        marker.bindPopup(`<div class="sensor-popup">
-            <strong>Sensor ID:</strong> ${sensorId}<br>
-            <strong>State:</strong> ${markerColor.toUpperCase()}
-        </div>`);
+
     } else {
         console.warn(`Marker for sensor ${sensorId} not found.`);
     }
@@ -217,15 +239,13 @@ function updateSensorMarker(sensorId, newState) {
 
 // Update sensor state via MQTT message
 function updateSensorState(sensorId, newState) {
-    // Create the MQTT message payload
+    const topic = `sensors/${selectedZone}`;
     const message = {
         sensorId: sensorId,
-        state: parseInt(newState)
+        state: parseInt(newState),
     };
 
-    // Publish the message to the MQTT topic
-    const topic = `${config.MQTT_TOPIC}`; // Ensure this matches the topic your backend is subscribed to
-    mqttClient.publish(topic, JSON.stringify(message), (err) => {
+    mqttClient.publish(topic, JSON.stringify(message), err => {
         if (err) {
             console.error('MQTT publish error:', err);
             alert('Failed to update sensor state.');
@@ -256,6 +276,8 @@ function onMapClick(e) {
 
     const { lat, lng } = e.latlng;
 
+    const zoneBaseUrl = config.ZONES[selectedZone];
+
     // Create a sensor create request
     const newSensor = {
         latitude: lat,
@@ -264,7 +286,7 @@ function onMapClick(e) {
     };
 
     // Send POST request to create a new sensor
-    axios.post(`${config.API_BASE_URL}/sensors`, newSensor)
+    axios.post(`${zoneBaseUrl}/sensors`, newSensor)
         .then(response => {
             const createdSensor = response.data;
             addSensorMarker(createdSensor);
@@ -279,7 +301,8 @@ function onMapClick(e) {
 
 // Fetch and display route by ID
 function fetchAndDisplayRoute(routeId) {
-    axios.get(`${config.API_BASE_URL}/routes/${routeId}`)
+    const zoneBaseUrl = config.ZONES[selectedZone];
+    axios.get(`${zoneBaseUrl}/routes/${routeId}`)
         .then(response => {
             const geoJson = response.data;
             displayRouteOnMap(geoJson);

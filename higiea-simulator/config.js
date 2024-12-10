@@ -9,9 +9,12 @@ try {
     };
 } catch (error) {
     config = {
-        API_BASE_URL: 'http://localhost:8081',
-        MQTT_BROKER_URL: 'ws://localhost:9002',
-        MQTT_TOPIC: 'sensors',
+        ZONES: {
+            all: null,
+            zone_a: 'http://localhost:8081',
+            zone_b: 'http://localhost:8082',
+        },
+        MQTT_BROKER_URL: 'ws://localhost:9001',
         MQTT_USERNAME: '',
         MQTT_PASSWORD: '',
     };

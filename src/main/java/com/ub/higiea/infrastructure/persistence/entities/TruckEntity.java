@@ -30,6 +30,14 @@ public class TruckEntity {
     public TruckEntity() {
     }
 
+    public TruckEntity(UUID id, String plate, int maxLoadCapacity, Double depotLatitude, Double depotLongitude) {
+        this.id = id;
+        this.plate = plate;
+        this.maxLoadCapacity = maxLoadCapacity;
+        this.depotLatitude = depotLatitude;
+        this.depotLongitude = depotLongitude;
+    }
+
     public UUID getId() {
         return id;
     }
