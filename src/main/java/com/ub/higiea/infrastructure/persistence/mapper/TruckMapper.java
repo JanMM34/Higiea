@@ -8,8 +8,8 @@ import com.ub.higiea.infrastructure.persistence.entities.TruckEntity;
 public class TruckMapper {
 
     public static Truck toDomain(TruckEntity truckEntity) {
-        Truck truck = Truck.create(
-                truckEntity.getId(),
+        Truck truck = Truck.create(null,
+                truckEntity.getPlate(),
                 truckEntity.getMaxLoadCapacity(),
                 Location.create(truckEntity.getDepotLatitude(),truckEntity.getDepotLongitude())
         );
@@ -21,9 +21,7 @@ public class TruckMapper {
 
     public static TruckEntity toEntity(Truck truck) {
         TruckEntity entity = new TruckEntity();
-        if (truck.getId() != null) {
-            entity.setId(truck.getId());
-        }
+        entity.setPlate(truck.getPlate());
         if (truck.hasAssignedRoute()) {
             entity.setRouteId(truck.getAssignedRoute().getId());
         }

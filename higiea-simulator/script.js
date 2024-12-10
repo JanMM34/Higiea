@@ -120,8 +120,8 @@ function populateTruckDropdown(trucks) {
 
     trucks.forEach(truck => {
         const option = document.createElement('option');
-        option.value = truck.id;
-        option.textContent = `Truck ${truck.id} (Capacity: ${truck.maxLoadCapacity})`;
+        option.value = truck.plate;
+        option.textContent = `Truck ${truck.plate} (Capacity: ${truck.maxLoadCapacity})`;
 
         // Store routeId in data attribute
         option.dataset.routeId = truck.routeId;
@@ -224,7 +224,7 @@ function updateSensorState(sensorId, newState) {
     };
 
     // Publish the message to the MQTT topic
-    const topic = 'sensors'; // Ensure this matches the topic your backend is subscribed to
+    const topic = `${config.MQTT_TOPIC}`; // Ensure this matches the topic your backend is subscribed to
     mqttClient.publish(topic, JSON.stringify(message), (err) => {
         if (err) {
             console.error('MQTT publish error:', err);
@@ -242,9 +242,9 @@ function createSensorPopupContent(sensorId, containerState) {
             <strong>Sensor ID:</strong> ${sensorId}<br>
             <strong>Current State:</strong> ${containerState}<br>
             <div class="state-buttons">
-                <button onclick="updateSensorState(${sensorId}, 0)">Set to EMPTY</button>
-                <button onclick="updateSensorState(${sensorId}, 50)">Set to HALF</button>
-                <button onclick="updateSensorState(${sensorId}, 80)">Set to FULL</button>
+                <button onclick="updateSensorState('${sensorId}', 0)">Set to EMPTY</button>
+                <button onclick="updateSensorState('${sensorId}', 50)">Set to HALF</button>
+                <button onclick="updateSensorState('${sensorId}', 80)">Set to FULL</button>
             </div>
         </div>
     `;

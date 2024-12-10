@@ -4,11 +4,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Table("truck")
 public class TruckEntity {
 
     @Id
-    private Long id;
+    private UUID id;
+
+    @Column("plate")
+    private String plate;
 
     @Column("route")
     private String routeId;
@@ -25,12 +30,16 @@ public class TruckEntity {
     public TruckEntity() {
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getPlate() {
+        return this.plate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 
     public String getRouteId() {

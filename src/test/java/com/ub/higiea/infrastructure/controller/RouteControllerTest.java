@@ -35,12 +35,26 @@ public class RouteControllerTest {
     @Test
     void getAllRoutes_ShouldReturnCombinedGeoJSON_WhenRoutesExist() {
 
-        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 60.0), ContainerState.FULL);
-        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Sensor sensor1 = Sensor.create(
+                UUID.randomUUID(),
+                Location.create(20.0, 10.0),
+                ContainerState.EMPTY);
 
-        Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
-        Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 500.0, 100L, List.of(Location.create(30.0, 60.0), Location.create(20.0, 10.0)));
+        Sensor sensor2 = Sensor.create(
+                UUID.randomUUID(),
+                Location.create(30.0, 60.0),
+                ContainerState.FULL
+        );
+
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 10, Location.create(10.0, 20.0));
+
+        Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L,
+                List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0))
+        );
+        Route route2 = Route.create("2", truck, List.of(sensor2, sensor1), 500.0, 100L,
+                List.of(Location.create(30.0, 60.0), Location.create(20.0, 10.0))
+        );
+
         RouteSummaryDTO summaryDTO1 = RouteSummaryDTO.fromRoute(route1);
         RouteSummaryDTO summaryDTO2 = RouteSummaryDTO.fromRoute(route2);
 
@@ -73,11 +87,24 @@ public class RouteControllerTest {
     @Test
     void getRouteById_ShouldReturnGeoJSON_WhenRouteExists() {
 
-        Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
-        Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 60.0), ContainerState.FULL);
-        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Sensor sensor1 = Sensor.create(
+                UUID.randomUUID(),
+                Location.create(20.0, 10.0),
+                ContainerState.EMPTY
+        );
 
-        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L, List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0)));
+        Sensor sensor2 = Sensor.create(
+                UUID.randomUUID(),
+                Location.create(30.0, 60.0),
+                ContainerState.FULL
+        );
+
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 10, Location.create(10.0, 20.0));
+
+        Route route = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L,
+                List.of(Location.create(20.0, 10.0), Location.create(30.0, 60.0))
+        );
+
         RouteDTO expectedRouteDTO = RouteDTO.fromRoute(route);
 
         String routeId = "1";

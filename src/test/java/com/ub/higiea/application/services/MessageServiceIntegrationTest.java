@@ -66,7 +66,7 @@ public class MessageServiceIntegrationTest {
 
         Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(15.0, 25.0), ContainerState.HALF);
 
-        Truck truck = Truck.create(1L, 5, Location.create(30.0, 40.0));
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 5, Location.create(30.0, 40.0));
         when(truckRepository.findAll()).thenReturn(Flux.just(truck));
         when(truckRepository.save(any(Truck.class))).thenReturn(Mono.just(truck));
 
@@ -90,8 +90,8 @@ public class MessageServiceIntegrationTest {
         when(routeCalculator.calculateRoute(truck.getDepotLocation(), sensors))
                 .thenReturn(Mono.just(calculationResult));
 
-        Route route = Route.create("route1", truck, sensors, calculationResult.getTotalDistance(),
-                calculationResult.getEstimatedTimeInSeconds(), calculationResult.getRouteGeometry());
+        Route route = Route.create("route1", truck, sensors, calculationResult.totalDistance(),
+                calculationResult.estimatedTimeInSeconds(), calculationResult.routeGeometry());
         when(routeRepository.save(any(Route.class))).thenReturn(Mono.just(route));
 
         Mono<Void> result = messageService.handleMessage(sensorId, stateFull);

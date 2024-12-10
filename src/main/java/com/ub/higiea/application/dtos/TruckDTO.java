@@ -8,13 +8,13 @@ import java.util.Objects;
 
 public class TruckDTO implements Serializable {
 
-    private final Long id;
+    private final String plate;
     private final String routeId;
     private final int maxLoadCapacity;
     private final Point depotLocation;
 
-    private TruckDTO(Long id, String routeId, int maxLoadCapacity, Point depotLocation) {
-        this.id = id;
+    private TruckDTO(String plate, String routeId, int maxLoadCapacity, Point depotLocation) {
+        this.plate = plate;
         this.routeId = routeId;
         this.maxLoadCapacity = maxLoadCapacity;
         this.depotLocation = depotLocation;
@@ -24,7 +24,7 @@ public class TruckDTO implements Serializable {
         String routeId = truck.hasAssignedRoute() ? truck.getAssignedRoute().getId() : null;
 
         return new TruckDTO(
-                truck.getId(),
+                truck.getPlate(),
                 routeId,
                 truck.getMaxLoadCapacity(),
                 new Point(
@@ -34,8 +34,8 @@ public class TruckDTO implements Serializable {
         );
     }
 
-    public Long getId() {
-        return id;
+    public String getPlate() {
+        return this.plate;
     }
 
     public String getRouteId() {
@@ -55,13 +55,13 @@ public class TruckDTO implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TruckDTO truckDTO = (TruckDTO) o;
-        return Objects.equals(this.id, truckDTO.id) &&
+        return Objects.equals(this.plate, truckDTO.plate) &&
                 Objects.equals(this.routeId, truckDTO.routeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, routeId);
+        return Objects.hash(plate, routeId);
     }
 
 }

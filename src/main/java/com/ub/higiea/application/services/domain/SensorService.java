@@ -45,7 +45,7 @@ public class SensorService {
 
     public Mono<SensorDTO> createSensor(SensorCreateRequest request) {
         Sensor sensor = Sensor.create(
-                UUID.randomUUID(),
+                null,
                 Location.create(request.getLatitude(), request.getLongitude()),
                 ContainerState.valueOf(request.getContainerState())
         );

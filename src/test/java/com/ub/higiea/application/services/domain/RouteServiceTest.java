@@ -38,7 +38,7 @@ public class RouteServiceTest {
 
     @Test
     void getAllRoutes_ShouldReturnAllRouteDTOs_WhenRepositoryNotEmpty() {
-        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 10, Location.create(10.0, 20.0));
         Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
         Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 20.0), ContainerState.FULL);
         Route route1 = Route.create("1", truck, List.of(sensor1, sensor2), 100.0, 50L,
@@ -69,7 +69,7 @@ public class RouteServiceTest {
     @Test
     void getRouteById_ShouldReturnRouteDTO_WhenRouteFound() {
         String routeId = "1";
-        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 10, Location.create(10.0, 20.0));
         Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
         Route route = Route.create(routeId, truck, List.of(sensor1), 100.0, 50L, List.of(Location.create(20.0, 10.0)));
 
@@ -96,7 +96,7 @@ public class RouteServiceTest {
 
     @Test
     void calculateAndSaveRoute_ShouldReturnSavedRoute_WhenValidInput() {
-        Truck truck = Truck.create(1L, 10, Location.create(10.0, 20.0));
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 10, Location.create(10.0, 20.0));
         Sensor sensor1 = Sensor.create(UUID.randomUUID(), Location.create(20.0, 10.0), ContainerState.EMPTY);
         Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 20.0), ContainerState.FULL);
         List<Sensor> sensors = List.of(sensor1, sensor2);
@@ -108,7 +108,7 @@ public class RouteServiceTest {
                 List.of(Location.create(10.0, 20.0), Location.create(20.0, 10.0), Location.create(30.0, 20.0))
         );
 
-        Route expectedRoute = Route.create(null, truck, sensors, 30.0, 45L, calculationResult.getRouteGeometry());
+        Route expectedRoute = Route.create(null, truck, sensors, 30.0, 45L, calculationResult.routeGeometry());
 
         when(routeCalculator.calculateRoute(truck.getDepotLocation(), sensors)).thenReturn(Mono.just(calculationResult));
         when(routeRepository.save(any(Route.class))).thenReturn(Mono.just(expectedRoute));
@@ -127,7 +127,7 @@ public class RouteServiceTest {
         assertEquals(sensors, savedRoute.getSensors());
         assertEquals(30.0, savedRoute.getTotalDistance());
         assertEquals(45L, savedRoute.getEstimatedTimeInSeconds());
-        assertEquals(calculationResult.getRouteGeometry(), savedRoute.getRouteGeometry());
+        assertEquals(calculationResult.routeGeometry(), savedRoute.getRouteGeometry());
     }
 
 }

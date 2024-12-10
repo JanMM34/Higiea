@@ -1,13 +1,14 @@
 package com.ub.higiea.infrastructure.persistence.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;
 
 import java.util.UUID;
 
 @Table("sensor")
-public class SensorEntity {
+public class SensorEntity{
 
     @Id
     private UUID id;

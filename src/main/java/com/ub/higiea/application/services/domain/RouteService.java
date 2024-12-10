@@ -43,10 +43,10 @@ public class RouteService {
                     Route route = Route.create(
                             null,
                             truck,
-                            result.getOrderedSensors(),
-                            result.getTotalDistance(),
-                            result.getEstimatedTimeInSeconds(),
-                            result.getRouteGeometry()
+                            result.orderedSensors(),
+                            result.totalDistance(),
+                            result.estimatedTimeInSeconds(),
+                            result.routeGeometry()
                     );
 
                     return routeRepository.save(route);
