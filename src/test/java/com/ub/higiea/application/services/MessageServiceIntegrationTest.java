@@ -70,13 +70,17 @@ public class MessageServiceIntegrationTest {
         when(sensorRepository.save(any(Sensor.class))).thenReturn(Mono.just(updatedSensor));
 
         Sensor sensor2 = Sensor.create(2L, Location.create(15.0, 25.0), ContainerState.HALF);
-        when(sensorRepository.findAll()).thenReturn(Flux.just(updatedSensor, sensor2));
 
         Truck truck = Truck.create(1L, 5, Location.create(30.0, 40.0));
         when(truckRepository.findAll()).thenReturn(Flux.just(truck));
         when(truckRepository.save(any(Truck.class))).thenReturn(Mono.just(truck));
 
+        when(sensorRepository.findRelevantSensors(5)).thenReturn(Flux.just(updatedSensor, sensor2));
+
         List<Sensor> sensors = List.of(updatedSensor, sensor2);
+        when(sensorRepository.saveAll(anyList()))
+                .thenReturn(Flux.fromIterable(sensors));
+
         RouteCalculationResult calculationResult = new RouteCalculationResult(
                 sensors,
                 100.0,
@@ -103,10 +107,11 @@ public class MessageServiceIntegrationTest {
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
         verify(truckRepository, times(1)).findAll();
-        verify(sensorRepository, times(1)).findAll();
+        verify(sensorRepository, times(1)).findRelevantSensors(5);
         verify(routeCalculator, times(1)).calculateRoute(truck.getDepotLocation(), sensors);
         verify(routeRepository, times(1)).save(any(Route.class));
         verify(truckRepository, times(1)).save(any(Truck.class));
+        verify(sensorRepository, times(1)).saveAll(anyList());
 
     }
 

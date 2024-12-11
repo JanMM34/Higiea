@@ -8,6 +8,8 @@ public class Sensor {
 
     private ContainerState containerState;
 
+    private boolean assignedToRoute;
+
     private Sensor() {
     }
 
@@ -15,6 +17,7 @@ public class Sensor {
         this.id = id;
         this.location = location;
         this.containerState = containerState;
+        this.assignedToRoute = false;
     }
 
     public static Sensor create(Long id, Location location, ContainerState containerState) {
@@ -35,6 +38,18 @@ public class Sensor {
 
     public void setContainerState(ContainerState containerState) {
         this.containerState = containerState;
+    }
+
+    public boolean isAssignedToRoute() {
+        return assignedToRoute;
+    }
+
+    public void markAssignedToRoute() {
+        this.assignedToRoute = true;
+    }
+
+    public void markUnassignedFromRoute() {
+        this.assignedToRoute = false;
     }
 
 }

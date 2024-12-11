@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Repository
 public class SensorRepositoryImpl implements SensorRepository {
 
@@ -33,6 +35,20 @@ public class SensorRepositoryImpl implements SensorRepository {
     public Mono<Sensor> save(Sensor sensor) {
         SensorEntity entity = SensorMapper.toEntity(sensor);
         return sensorEntityRepository.save(entity)
+                .map(SensorMapper::toDomain);
+    }
+
+    @Override
+    public Flux<Sensor> saveAll(List<Sensor> sensors) {
+        return Flux.fromIterable(sensors)
+                .map(SensorMapper::toEntity)
+                .flatMap(sensorEntityRepository::save)
+                .map(SensorMapper::toDomain);
+    }
+
+    @Override
+    public Flux<Sensor> findRelevantSensors(int capacity) {
+        return sensorEntityRepository.findRelevantSensors(capacity)
                 .map(SensorMapper::toDomain);
     }
 

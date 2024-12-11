@@ -46,14 +46,16 @@ public class MessageService {
                         .flatMap(sensors -> Mono.zip(
                                 Mono.just(truck),
                                 routeService.calculateAndSaveRoute(truck, sensors)
-                        ))
-                )
-                .flatMap(tuple -> {
-                    Truck truck = tuple.getT1();
-                    Route route = tuple.getT2();
-                    return truckService.assignRouteToTruck(truck, route);
-                })
-                .then();
+                        ).flatMap(tuple -> {
+                            Truck assignedTruck = tuple.getT1();
+                            Route route = tuple.getT2();
+
+                            return Mono.when(
+                                    sensorService.saveAll(sensors),
+                                    truckService.assignRouteToTruck(assignedTruck, route)
+                            );
+                        }))
+                ).then();
     }
 
     public Mono<RouteDTO> createRoute(RouteCreateRequest request) {
