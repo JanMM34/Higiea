@@ -10,7 +10,10 @@ import com.ub.higiea.domain.model.Truck;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,22 +43,23 @@ public class MessageService {
     }
 
     private Mono<Void> handleFullContainer() {
-        return truckService.fetchAvailableTruck()
-                .flatMap(truck -> sensorService.fetchRelevantSensors(truck.getMaxLoadCapacity())
-                        .collectList()
-                        .flatMap(sensors -> Mono.zip(
-                                Mono.just(truck),
-                                routeService.calculateAndSaveRoute(truck, sensors)
-                        ).flatMap(tuple -> {
-                            Truck assignedTruck = tuple.getT1();
-                            Route route = tuple.getT2();
+        return sensorService.fetchRelevantSensorsForRouting()
+                .collectList()
+                .flatMap(sensors -> {
 
-                            return Mono.when(
-                                    sensorService.saveAll(sensors),
-                                    truckService.assignRouteToTruck(assignedTruck, route)
+                    int totalCapacity = sensors.stream()
+                            .mapToInt(sensor -> sensor.getContainerState().getLevel())
+                            .sum();
+
+                    return truckService.fetchOptimalTruck(totalCapacity)
+                            .flatMap(truck -> routeService.calculateAndSaveRoute(truck, sensors)
+                                    .flatMap(route -> Mono.when(
+                                            sensorService.saveAll(sensors),
+                                            truckService.assignRouteToTruck(truck, route)
+                                    ))
                             );
-                        }))
-                ).then();
+                })
+                .then();
     }
 
 }

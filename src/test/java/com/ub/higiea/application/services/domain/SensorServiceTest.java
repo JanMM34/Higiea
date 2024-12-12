@@ -116,11 +116,11 @@ public class SensorServiceTest {
         Sensor sensorFull2 = Sensor.create(UUID.randomUUID(), Location.create(25.0, 35.0), ContainerState.FULL);
         Sensor sensorHalf2 = Sensor.create(UUID.randomUUID(), Location.create(30.0, 40.0), ContainerState.HALF);
 
-        when(sensorRepository.findRelevantSensors(capacity))
+        when(sensorRepository.findUnassignedSensorsSortedByPriority())
                 .thenReturn(Flux.just(sensorFull1, sensorFull2, sensorHalf1, sensorHalf2));
 
 
-        Flux<Sensor> result = sensorService.fetchRelevantSensors(capacity);
+        Flux<Sensor> result = sensorService.fetchRelevantSensorsForRouting();
 
         StepVerifier.create(result)
                 .expectNext(sensorFull1)
@@ -129,7 +129,7 @@ public class SensorServiceTest {
                 .expectNext(sensorHalf2)
                 .verifyComplete();
 
-        verify(sensorRepository, times(1)).findRelevantSensors(capacity);
+        verify(sensorRepository, times(1)).findUnassignedSensorsSortedByPriority();
     }
 
 }

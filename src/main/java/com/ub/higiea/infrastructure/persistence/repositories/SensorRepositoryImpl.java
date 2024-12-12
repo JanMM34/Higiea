@@ -48,8 +48,8 @@ public class SensorRepositoryImpl implements SensorRepository {
     }
 
     @Override
-    public Flux<Sensor> findRelevantSensors(int capacity) {
-        return sensorEntityRepository.findRelevantSensors(capacity)
+    public Flux<Sensor> findUnassignedSensorsSortedByPriority() {
+        return sensorEntityRepository.findUnassignedFullOrHalfSensorsSortedByPriority()
                 .map(SensorMapper::toDomain);
     }
 

@@ -1,6 +1,5 @@
 package com.ub.higiea.infrastructure.persistence.repositories;
 
-import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.infrastructure.persistence.entities.SensorEntity;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -11,7 +10,10 @@ import java.util.UUID;
 
 public interface SensorEntityRepository extends ReactiveCrudRepository<SensorEntity, UUID> {
 
-    @Query("SELECT * FROM sensor WHERE assigned_to_route = false AND state != 'EMPTY' ORDER BY state DESC LIMIT :capacity")
-    Flux<SensorEntity> findRelevantSensors(int capacity);
+    @Query("SELECT * FROM sensor " +
+            "WHERE assigned_to_route = false " +
+            "AND state IN ('FULL', 'HALF') " +
+            "ORDER BY CASE WHEN state = 'FULL' THEN 0 ELSE 1 END ASC")
+    Flux<SensorEntity> findUnassignedFullOrHalfSensorsSortedByPriority();
 
 }

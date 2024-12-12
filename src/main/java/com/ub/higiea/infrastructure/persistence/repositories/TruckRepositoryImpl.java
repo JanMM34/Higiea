@@ -38,4 +38,10 @@ public class TruckRepositoryImpl implements TruckRepository {
                 .map(TruckMapper::toDomain);
     }
 
+    @Override
+    public Mono<Truck> fetchOptimalTruck(int totalCapacity) {
+        return truckEntityRepository.findOptimalTruck(totalCapacity)
+                .map(TruckMapper::toDomain);
+    }
+
 }

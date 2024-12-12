@@ -14,4 +14,5 @@ public interface TruckRepository {
 
     Mono<Truck> save(Truck truck);
 
+    Mono<Truck> fetchOptimalTruck(int totalCapacity);
 }

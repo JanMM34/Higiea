@@ -41,11 +41,6 @@ public class TruckService {
                 )).map(TruckDTO::fromTruck);
     }
 
-    public Mono<Truck> fetchAvailableTruck() {
-        return truckRepository.findAll()
-                .filter(truck -> !truck.hasAssignedRoute())
-                .next();
-    }
 
     public Mono<TruckDTO> unassignRouteFromTruck(UUID id) {
         return truckRepository.findById(id)
@@ -65,4 +60,7 @@ public class TruckService {
         return truckRepository.save(truck);
     }
 
+    public Mono<Truck> fetchOptimalTruck(int totalCapacity) {
+        return truckRepository.fetchOptimalTruck(totalCapacity);
+    }
 }

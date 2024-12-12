@@ -66,11 +66,11 @@ public class MessageServiceIntegrationTest {
 
         Sensor sensor2 = Sensor.create(UUID.randomUUID(), Location.create(15.0, 25.0), ContainerState.HALF);
 
-        Truck truck = Truck.create(UUID.randomUUID(),"1", 5, Location.create(30.0, 40.0));
-        when(truckRepository.findAll()).thenReturn(Flux.just(truck));
+        Truck truck = Truck.create(UUID.randomUUID(),"1", 150, Location.create(30.0, 40.0));
         when(truckRepository.save(any(Truck.class))).thenReturn(Mono.just(truck));
+        when(truckRepository.fetchOptimalTruck(130)).thenReturn(Mono.just(truck));
 
-        when(sensorRepository.findRelevantSensors(5)).thenReturn(Flux.just(updatedSensor, sensor2));
+        when(sensorRepository.findUnassignedSensorsSortedByPriority()).thenReturn(Flux.just(updatedSensor,sensor2));
 
         List<Sensor> sensors = List.of(updatedSensor, sensor2);
         when(sensorRepository.saveAll(anyList()))
@@ -100,8 +100,7 @@ public class MessageServiceIntegrationTest {
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
-        verify(truckRepository, times(1)).findAll();
-        verify(sensorRepository, times(1)).findRelevantSensors(5);
+        verify(sensorRepository, times(1)).findUnassignedSensorsSortedByPriority();
         verify(routeCalculator, times(1)).calculateRoute(truck.getDepotLocation(), sensors);
         verify(routeRepository, times(1)).save(any(Route.class));
         verify(truckRepository, times(1)).save(any(Truck.class));
@@ -121,8 +120,8 @@ public class MessageServiceIntegrationTest {
                 .thenReturn(Mono.just(updatedSensor));
 
         when(sensorRepository.save(any(Sensor.class))).thenReturn(Mono.just(updatedSensor));
-
-        when(truckRepository.findAll()).thenReturn(Flux.empty());
+        when(sensorRepository.findUnassignedSensorsSortedByPriority()).thenReturn(Flux.just(updatedSensor));
+        when(truckRepository.fetchOptimalTruck(state)).thenReturn(Mono.empty());
 
         Mono<Void> result = messageService.handleMessage(sensorId, state);
 
@@ -131,7 +130,7 @@ public class MessageServiceIntegrationTest {
 
         verify(sensorRepository, times(1)).findById(sensorId);
         verify(sensorRepository, times(1)).save(any(Sensor.class));
-        verify(truckRepository, times(1)).findAll();
+        verify(truckRepository, times(1)).fetchOptimalTruck(state);
         verifyNoMoreInteractions(sensorRepository, truckRepository, routeRepository, routeCalculator);
     }
 }
