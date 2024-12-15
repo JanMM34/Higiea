@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,7 +66,7 @@ public class SensorService {
                 .then();
     }
 
-    public Flux<Sensor> fetchRelevantSensorsForRouting() {
+    public Flux<Sensor> fetchSensorsByPriorityState() {
         return sensorRepository.findUnassignedSensorsSortedByPriority();
     }
 }

@@ -56,7 +56,6 @@ const mqttOptions = {
     keepalive: 60,
     clean: true,
     reconnectPeriod: 4000,
-    protocol: 'mqtt'
 };
 
 // Connect to the MQTT broker over WebSocket

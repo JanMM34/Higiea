@@ -38,7 +38,7 @@ public class RouteService {
     }
 
     public Mono<Route> calculateAndSaveRoute(Truck truck, List<Sensor> sensorWaypoints) {
-        return routeCalculator.calculateRoute(truck.getDepotLocation(),sensorWaypoints)
+        return routeCalculator.calculateRoute(truck.getDepotLocation(), sensorWaypoints)
                 .flatMap(result -> {
                     Route route = Route.create(
                             null,
@@ -48,7 +48,6 @@ public class RouteService {
                             result.estimatedTimeInSeconds(),
                             result.routeGeometry()
                     );
-
                     return routeRepository.save(route);
                 });
     }

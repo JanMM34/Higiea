@@ -1,19 +1,15 @@
 package com.ub.higiea.application.services;
 
-import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.services.domain.RouteService;
+import com.ub.higiea.application.utils.RoutePlanningStrategy;
+import com.ub.higiea.application.utils.RouteTriggerStrategy;
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
-import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.Truck;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,43 +17,47 @@ import java.util.UUID;
 public class MessageService {
 
     private final SensorService sensorService;
-    private final RouteService routeService;
     private final TruckService truckService;
+    private final RouteService routeService;
+    private final RouteTriggerStrategy routeTriggerStrategy;
+    private final RoutePlanningStrategy routePlanningStrategy;
 
-    public MessageService(SensorService sensorService, RouteService routeService, TruckService truckService) {
+    public MessageService(SensorService sensorService, TruckService truckService, RouteService routeService,
+                          RouteTriggerStrategy routeTriggerStrategy, RoutePlanningStrategy routePlanningStrategy) {
+
         this.sensorService = sensorService;
-        this.routeService = routeService;
         this.truckService = truckService;
+        this.routeService = routeService;
+        this.routeTriggerStrategy = routeTriggerStrategy;
+        this.routePlanningStrategy = routePlanningStrategy;
     }
 
     public Mono<Void> handleMessage(UUID sensorId, int state) {
-        return Mono.defer(() ->
-                sensorService.updateSensorState(sensorId, state)
-                        .flatMap(sensor -> {
-                            if (sensor.getContainerState().name().equals("FULL")) {
-                                return handleFullContainer();
+        return sensorService.updateSensorState(sensorId, state)
+                .flatMap(sensor -> routeTriggerStrategy.shouldTriggerRoute(sensor)
+                        .flatMap(shouldTrigger -> {
+                            if (shouldTrigger) {
+                                return triggerRoute();
+                            } else {
+                                return Mono.empty();
                             }
-                            return Mono.empty();
                         })
-        ).then();
+                ).then();
     }
 
-    private Mono<Void> handleFullContainer() {
-        return sensorService.fetchRelevantSensorsForRouting()
-                .collectList()
-                .flatMap(sensors -> {
-
-                    int totalCapacity = sensors.stream()
-                            .mapToInt(sensor -> sensor.getContainerState().getLevel())
-                            .sum();
-
-                    return truckService.fetchOptimalTruck(totalCapacity)
-                            .flatMap(truck -> routeService.calculateAndSaveRoute(truck, sensors)
-                                    .flatMap(route -> Mono.when(
-                                            sensorService.saveAll(sensors),
-                                            truckService.assignRouteToTruck(truck, route)
-                                    ))
-                            );
+    private Mono<Void> triggerRoute() {
+        return routePlanningStrategy.prepareRoute()
+                .flatMap(tuple -> {
+                    Truck truck = tuple.getT1();
+                    List<Sensor> sensors = tuple.getT2();
+                    return routeService.calculateAndSaveRoute(truck, sensors)
+                            .flatMap(route -> {
+                                sensors.forEach(Sensor::markAssignedToRoute);
+                                return Mono.when(
+                                        sensorService.saveAll(sensors),
+                                        truckService.assignRouteToTruck(truck,route)
+                                );
+                            });
                 })
                 .then();
     }

@@ -1,7 +1,9 @@
+DROP TABLE IF EXISTS sensor;
+DROP TABLE IF EXISTS truck;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS sensor (
+CREATE TABLE sensor (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
@@ -9,7 +11,7 @@ CREATE TABLE IF NOT EXISTS sensor (
     assigned_to_route BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE IF NOT EXISTS truck (
+CREATE TABLE truck (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     plate VARCHAR(15),
     route VARCHAR(255),

@@ -17,9 +17,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -120,7 +117,7 @@ public class SensorServiceTest {
                 .thenReturn(Flux.just(sensorFull1, sensorFull2, sensorHalf1, sensorHalf2));
 
 
-        Flux<Sensor> result = sensorService.fetchRelevantSensorsForRouting();
+        Flux<Sensor> result = sensorService.fetchSensorsByPriorityState();
 
         StepVerifier.create(result)
                 .expectNext(sensorFull1)
