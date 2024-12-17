@@ -1,8 +1,8 @@
-package com.ub.higiea.application.implementations;
+package com.ub.higiea.application.strategies.implementations;
 
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
-import com.ub.higiea.application.utils.RoutePlanningStrategy;
+import com.ub.higiea.application.strategies.RoutePlanningStrategy;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.Truck;
 import org.springframework.stereotype.Component;

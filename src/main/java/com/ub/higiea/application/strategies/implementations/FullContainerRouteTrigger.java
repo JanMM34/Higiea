@@ -1,6 +1,6 @@
-package com.ub.higiea.application.implementations;
+package com.ub.higiea.application.strategies.implementations;
 
-import com.ub.higiea.application.utils.RouteTriggerStrategy;
+import com.ub.higiea.application.strategies.RouteTriggerStrategy;
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Sensor;
 import org.springframework.stereotype.Component;

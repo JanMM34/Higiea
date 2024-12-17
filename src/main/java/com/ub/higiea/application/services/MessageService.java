@@ -1,8 +1,8 @@
 package com.ub.higiea.application.services;
 
 import com.ub.higiea.application.services.domain.RouteService;
-import com.ub.higiea.application.utils.RoutePlanningStrategy;
-import com.ub.higiea.application.utils.RouteTriggerStrategy;
+import com.ub.higiea.application.strategies.RoutePlanningStrategy;
+import com.ub.higiea.application.strategies.RouteTriggerStrategy;
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.domain.model.Sensor;
