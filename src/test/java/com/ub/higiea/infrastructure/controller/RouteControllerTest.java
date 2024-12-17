@@ -6,7 +6,6 @@ import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
 import com.ub.higiea.domain.model.*;
-import com.ub.higiea.infrastructure.utils.GeoJsonUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +72,6 @@ public class RouteControllerTest {
     @Test
     void getAllRoutes_ShouldReturnEmptyGeoJSON_WhenNoRoutesExist() {
         Mockito.when(routeService.getAllRoutes()).thenReturn(Flux.empty());
-        String expectedGeoJSON = GeoJsonUtils.combineRoutes(List.of());
-
         webTestClient.get()
                 .uri("/routes")
                 .accept(MediaType.APPLICATION_JSON)

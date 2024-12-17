@@ -1,4 +1,4 @@
-package com.ub.higiea.infrastructure.adapters;
+package com.ub.higiea.application.implementations;
 
 import com.ub.higiea.application.utils.RouteTriggerStrategy;
 import com.ub.higiea.domain.model.ContainerState;

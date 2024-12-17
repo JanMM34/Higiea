@@ -17,4 +17,10 @@ public interface TruckEntityRepository extends ReactiveCrudRepository<TruckEntit
             "LIMIT 1")
     Mono<TruckEntity> findOptimalTruck(int requiredCapacity);
 
+
+    @Query("SELECT * FROM truck " +
+            "WHERE (route IS NULL OR route = '') " +
+            "ORDER BY max_load_capacity DESC " +
+            "LIMIT 1")
+    Mono<TruckEntity> findBiggestTruck();
 }

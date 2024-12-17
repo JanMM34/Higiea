@@ -44,4 +44,10 @@ public class TruckRepositoryImpl implements TruckRepository {
                 .map(TruckMapper::toDomain);
     }
 
+    @Override
+    public Mono<Truck> fetchBiggestTruck() {
+        return truckEntityRepository.findBiggestTruck()
+                .map(TruckMapper::toDomain);
+    }
+
 }
