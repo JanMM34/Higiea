@@ -63,4 +63,9 @@ public class TruckService {
     public Mono<Truck> fetchOptimalTruck(int totalCapacity) {
         return truckRepository.fetchOptimalTruck(totalCapacity);
     }
+
+    public Mono<Truck> fetchBiggestTruck() {
+        return truckRepository.fetchBiggestTruck();
+    }
+
 }
