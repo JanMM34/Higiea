@@ -18,4 +18,5 @@ public interface SensorRepository {
     Flux<Sensor> saveAll(List<Sensor> sensors);
 
     Flux<Sensor> findUnassignedSensorsSortedByPriority();
+
 }

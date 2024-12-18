@@ -41,9 +41,11 @@ public class SensorRepositoryImpl implements SensorRepository {
 
     @Override
     public Flux<Sensor> saveAll(List<Sensor> sensors) {
-        return Flux.fromIterable(sensors)
+        List<SensorEntity> entities = sensors.stream()
                 .map(SensorMapper::toEntity)
-                .flatMap(sensorEntityRepository::save)
+                .toList();
+
+        return sensorEntityRepository.saveAll(entities)
                 .map(SensorMapper::toDomain);
     }
 

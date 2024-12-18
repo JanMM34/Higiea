@@ -8,7 +8,7 @@ CREATE TABLE sensor (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     state VARCHAR(255) NOT NULL,
-    assigned_to_route BOOLEAN DEFAULT FALSE
+    assigned_route VARCHAR(255)
 );
 
 CREATE TABLE truck (

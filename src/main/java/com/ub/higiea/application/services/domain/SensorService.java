@@ -1,12 +1,18 @@
 package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.SensorDTO;
+import com.ub.higiea.application.dtos.TruckDTO;
+import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
 import com.ub.higiea.application.requests.SensorCreateRequest;
 import com.ub.higiea.application.exception.notfound.SensorNotFoundException;
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
+import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.repository.SensorRepository;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +22,8 @@ import java.util.UUID;
 
 @Service
 public class SensorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SensorService.class);
 
     private final SensorRepository sensorRepository;
 
@@ -69,4 +77,26 @@ public class SensorService {
     public Flux<Sensor> fetchSensorsByPriorityState() {
         return sensorRepository.findUnassignedSensorsSortedByPriority();
     }
+
+    public Flux<Sensor> assignRouteToSensors(List<Sensor> sensors, Route route) {
+        return Flux.fromIterable(sensors)
+                .doOnNext(sensor -> sensor.assignRoute(route))
+                .collectList()
+                .flatMapMany(sensorRepository::saveAll);
+    }
+
+    public Mono<Void> markSensorUnassigned(Sensor sensor) {
+        return Mono.just(sensor)
+                .flatMap(s -> {
+                    if (!s.hasAssignedRoute()) {
+                        return Mono.error(new IllegalStateException("Sensor does not have an assigned route"));
+                    }
+                    s.unassignRoute();
+                    return sensorRepository.save(s);
+                })
+                .doOnSuccess(savedSensor -> logger.info("Sensor unassigned and saved: {}", savedSensor))
+                .doOnError(error -> logger.error("Error while marking sensor as unassigned", error))
+                .then();
+    }
+
 }

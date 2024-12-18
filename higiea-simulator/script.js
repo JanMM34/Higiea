@@ -391,13 +391,11 @@ function addSensorMarkerOnRoute(latitude, longitude, properties) {
         popupAnchor: [0, -7],
     });
 
-    // Add marker to the route layer
+    const popupContent = createSensorPopupContent(sensorId, containerState);
+
     L.marker([latitude, longitude], { icon: sensorIcon })
         .addTo(map.routeLayer)
-        .bindPopup(`<div class="sensor-popup">
-                      <strong>Sensor ID:</strong> ${sensorId}<br>
-                      <strong>State:</strong> ${containerState}
-                    </div>`);
+        .bindPopup(popupContent);
 }
 
 // Clear existing route from the map
