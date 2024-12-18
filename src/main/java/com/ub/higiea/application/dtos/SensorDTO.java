@@ -10,22 +10,25 @@ import java.util.UUID;
 public class SensorDTO implements Serializable {
 
     private final UUID id;
-
     private final Point location;
-
     private final ContainerState containerState;
+    private final String routeId;
 
-    private SensorDTO(UUID id, Point location, ContainerState containerState) {
+    private SensorDTO(UUID id, Point location, ContainerState containerState, String routeId) {
         this.id = id;
         this.location = location;
         this.containerState = containerState;
+        this.routeId = routeId;
     }
 
     public static SensorDTO fromSensor(Sensor sensor) {
+        String routeId = sensor.hasAssignedRoute() ? sensor.getAssignedRoute().getId() : null;
+
         return new SensorDTO(
                 sensor.getId(),
                 new Point(sensor.getLocation().getLatitude(),sensor.getLocation().getLongitude()),
-                sensor.getContainerState()
+                sensor.getContainerState(),
+                routeId
         );
     }
 
@@ -35,6 +38,10 @@ public class SensorDTO implements Serializable {
 
     public Point getLocation() {
         return location;
+    }
+
+    public String getRouteId() {
+        return routeId;
     }
 
     public ContainerState getContainerState() {

@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface SensorEntityRepository extends ReactiveCrudRepository<SensorEntity, UUID> {
 
     @Query("SELECT * FROM sensor " +
-            "WHERE assigned_to_route = false " +
+            "WHERE (assigned_route IS NULL OR assigned_route = '')" +
             "AND state IN ('FULL', 'HALF') " +
             "ORDER BY CASE WHEN state = 'FULL' THEN 0 ELSE 1 END ASC")
     Flux<SensorEntity> findUnassignedFullOrHalfSensorsSortedByPriority();

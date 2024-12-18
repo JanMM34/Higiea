@@ -10,20 +10,20 @@ public class Sensor {
 
     private ContainerState containerState;
 
-    private boolean assignedToRoute;
+    private Route assignedRoute;
 
     private Sensor() {
     }
 
-    private Sensor(UUID id, Location location, ContainerState containerState) {
+    private Sensor(UUID id, Location location, ContainerState containerState, Route assignedRoute) {
         this.id = id;
         this.location = location;
         this.containerState = containerState;
-        this.assignedToRoute = false;
+        this.assignedRoute = assignedRoute;
     }
 
     public static Sensor create(UUID id, Location location, ContainerState containerState) {
-        return new Sensor(id, location, containerState);
+        return new Sensor(id, location, containerState,null);
     }
 
     public UUID getId() {
@@ -42,16 +42,26 @@ public class Sensor {
         this.containerState = containerState;
     }
 
-    public boolean isAssignedToRoute() {
-        return assignedToRoute;
+    public Route getAssignedRoute() {
+        return assignedRoute;
     }
 
-    public void markAssignedToRoute() {
-        this.assignedToRoute = true;
+    public void assignRoute(Route route) {
+        if (this.assignedRoute != null) {
+            throw new IllegalStateException("Sensor is already assigned to a assignedRoute");
+        }
+        this.assignedRoute = route;
     }
 
-    public void markUnassignedFromRoute() {
-        this.assignedToRoute = false;
+    public void unassignRoute() {
+        if (this.assignedRoute == null) {
+            throw new IllegalStateException("Sensor does not have an assigned route");
+        }
+        this.assignedRoute = null;
+    }
+
+    public boolean hasAssignedRoute() {
+        return this.assignedRoute != null;
     }
 
 }

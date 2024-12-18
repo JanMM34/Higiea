@@ -22,8 +22,8 @@ public class SensorEntity{
     @Column("state")
     private String containerState;
 
-    @Column("assigned_to_route")
-    private boolean assignedToRoute;
+    @Column("assigned_route")
+    private String routeId;
 
     public SensorEntity() {
     }
@@ -55,12 +55,12 @@ public class SensorEntity{
         this.id = id;
     }
 
-    public boolean isAssignedToRoute() {
-        return assignedToRoute;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public void setAssignedToRoute(boolean assignedToRoute) {
-        this.assignedToRoute = assignedToRoute;
+    public void setRouteId(String routeId) {
+        this.routeId = routeId;
     }
 
 }

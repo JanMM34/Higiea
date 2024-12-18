@@ -69,7 +69,7 @@ public class MessageServiceTest {
         when(routeService.calculateAndSaveRoute(any(Truck.class), anyList()))
                 .thenReturn(Mono.just(Route.create("route1", null, List.of(updatedSensor), 100.0, 200L, List.of())));
 
-        when(sensorService.saveAll(anyList())).thenReturn(Flux.fromIterable(List.of(updatedSensor)).then());
+        when(sensorService.assignRouteToSensors(anyList(),any(Route.class))).thenReturn(Flux.empty());
         when(truckService.assignRouteToTruck(any(Truck.class), any(Route.class))).thenReturn(Mono.empty());
 
         Mono<Void> result = messageService.handleMessage(sensorId, state);
@@ -81,7 +81,7 @@ public class MessageServiceTest {
         verify(routeTriggerStrategy, times(1)).shouldTriggerRoute(updatedSensor);
         verify(routePlanningStrategy, times(1)).prepareRoute();
         verify(routeService, times(1)).calculateAndSaveRoute(any(Truck.class), anyList());
-        verify(sensorService, times(1)).saveAll(anyList());
+        verify(sensorService, times(1)).assignRouteToSensors(anyList(),any(Route.class));
         verify(truckService, times(1)).assignRouteToTruck(any(Truck.class), any(Route.class));
     }
 

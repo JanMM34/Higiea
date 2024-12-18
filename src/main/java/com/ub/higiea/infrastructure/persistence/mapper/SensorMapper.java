@@ -2,6 +2,7 @@ package com.ub.higiea.infrastructure.persistence.mapper;
 
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Location;
+import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.infrastructure.persistence.entities.SensorEntity;
 
@@ -13,8 +14,8 @@ public class SensorMapper {
                 Location.create(entity.getLatitude(), entity.getLongitude()),
                 ContainerState.valueOf(entity.getContainerState())
         );
-        if (entity.isAssignedToRoute()) {
-            sensor.markAssignedToRoute();
+        if (entity.getRouteId() != null) {
+            sensor.assignRoute(Route.create(entity.getRouteId(),null, null, null, null, null));
         }
         return sensor;
     }
@@ -26,7 +27,11 @@ public class SensorMapper {
                 sensor.getLocation().getLongitude(),
                 sensor.getContainerState().toString()
         );
-        entity.setAssignedToRoute(sensor.isAssignedToRoute());
+        if(sensor.hasAssignedRoute()) {
+            entity.setRouteId(sensor.getAssignedRoute().getId());
+        }else {
+            entity.setRouteId(null);
+        }
         return entity;
     }
 

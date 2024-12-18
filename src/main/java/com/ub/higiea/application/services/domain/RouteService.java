@@ -37,6 +37,11 @@ public class RouteService {
                 .map(RouteDTO::fromRoute);
     }
 
+    public Mono<Route> getRouteEntityById(String routeId) {
+        return routeRepository.findById(routeId)
+                .switchIfEmpty(Mono.error(new RouteNotFoundException(routeId)));
+    }
+
     public Mono<Route> calculateAndSaveRoute(Truck truck, List<Sensor> sensorWaypoints) {
         return routeCalculator.calculateRoute(truck.getDepotLocation(), sensorWaypoints)
                 .flatMap(result -> {
@@ -50,6 +55,13 @@ public class RouteService {
                     );
                     return routeRepository.save(route);
                 });
+    }
+
+    public Mono<Boolean> checkIfLastSensor(Sensor sensor) {
+        return this.routeRepository.findById(sensor.getAssignedRoute().getId())
+                .map(route -> route.getSensors().getLast().getId().equals(sensor.getId()))
+                .defaultIfEmpty(false);
+
     }
 
 }
