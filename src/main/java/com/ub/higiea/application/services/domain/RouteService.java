@@ -2,7 +2,7 @@ package com.ub.higiea.application.services.domain;
 
 import com.ub.higiea.application.dtos.RouteSummaryDTO;
 import com.ub.higiea.application.exception.notfound.RouteNotFoundException;
-import com.ub.higiea.application.strategies.RouteCalculator;
+import com.ub.higiea.application.ports.RouteCalculator;
 import com.ub.higiea.application.dtos.RouteDTO;
 import com.ub.higiea.domain.model.Route;
 import com.ub.higiea.domain.model.Sensor;

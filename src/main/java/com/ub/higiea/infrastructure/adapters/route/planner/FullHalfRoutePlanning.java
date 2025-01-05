@@ -1,8 +1,8 @@
-package com.ub.higiea.application.strategies.implementations;
+package com.ub.higiea.infrastructure.adapters.route.planner;
 
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
-import com.ub.higiea.application.strategies.RoutePlanningStrategy;
+import com.ub.higiea.application.ports.RoutePlanning;
 import com.ub.higiea.domain.model.Sensor;
 import com.ub.higiea.domain.model.Truck;
 import org.springframework.stereotype.Component;
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class FullHalfRoutePlanningStrategy implements RoutePlanningStrategy {
+public class FullHalfRoutePlanning implements RoutePlanning {
 
     private final SensorService sensorService;
     private final TruckService truckService;
 
-    public FullHalfRoutePlanningStrategy(SensorService sensorService, TruckService truckService) {
+    public FullHalfRoutePlanning(SensorService sensorService, TruckService truckService) {
         this.sensorService = sensorService;
         this.truckService = truckService;
     }

@@ -1,6 +1,6 @@
 package com.ub.higiea.application.services;
 
-import com.ub.higiea.application.strategies.implementations.FullHalfRoutePlanningStrategy;
+import com.ub.higiea.infrastructure.adapters.route.planner.FullHalfRoutePlanning;
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.domain.model.ContainerState;
@@ -24,7 +24,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FullHalfRoutePlanningStrategyTest {
+public class FullHalfRoutePlanningTest {
 
     @Mock
     private SensorService sensorService;
@@ -32,11 +32,11 @@ public class FullHalfRoutePlanningStrategyTest {
     @Mock
     private TruckService truckService;
 
-    private FullHalfRoutePlanningStrategy strategy;
+    private FullHalfRoutePlanning strategy;
 
     @BeforeEach
     void setUp() {
-        strategy = new FullHalfRoutePlanningStrategy(sensorService, truckService);
+        strategy = new FullHalfRoutePlanning(sensorService, truckService);
     }
 
     @Test

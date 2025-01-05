@@ -11,6 +11,7 @@ services:
       DB_USERNAME: zone_a_user
       DB_PASSWORD: zone_a_pass
       MONGODB_URI: mongodb://mongo:27017/higiea-routes
+      MONGODB_NAME: zone_a
       MQTT_BROKER_URL: tcp://mqtt:1883
       MQTT_BROKER_TOPIC: sensors/zone_a
     depends_on:
@@ -30,6 +31,7 @@ services:
       DB_USERNAME: zone_b_user
       DB_PASSWORD: zone_b_pass
       MONGODB_URI: mongodb://mongo:27017/higiea-routes
+      MONGODB_NAME: zone_b
       MQTT_BROKER_URL: tcp://mqtt:1883
       MQTT_BROKER_TOPIC: sensors/zone_b
     depends_on:

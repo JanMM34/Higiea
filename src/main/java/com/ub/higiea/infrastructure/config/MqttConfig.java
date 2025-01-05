@@ -1,6 +1,6 @@
 package com.ub.higiea.infrastructure.config;
 
-import com.ub.higiea.infrastructure.ports.mqtt.MqttMessageListener;
+import com.ub.higiea.infrastructure.mqtt.MqttMessageListener;
 import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

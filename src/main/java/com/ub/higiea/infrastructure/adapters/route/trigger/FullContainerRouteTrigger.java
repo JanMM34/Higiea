@@ -1,13 +1,13 @@
-package com.ub.higiea.application.strategies.implementations;
+package com.ub.higiea.infrastructure.adapters.route.trigger;
 
-import com.ub.higiea.application.strategies.RouteTriggerStrategy;
+import com.ub.higiea.application.ports.RouteTrigger;
 import com.ub.higiea.domain.model.ContainerState;
 import com.ub.higiea.domain.model.Sensor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class FullContainerRouteTrigger implements RouteTriggerStrategy{
+public class FullContainerRouteTrigger implements RouteTrigger {
 
     @Override
     public Mono<Boolean> shouldTriggerRoute(Sensor sensor) {

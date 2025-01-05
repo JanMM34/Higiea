@@ -1,8 +1,8 @@
-package com.ub.higiea.application.strategies;
+package com.ub.higiea.application.ports;
 
 import com.ub.higiea.domain.model.Sensor;
 import reactor.core.publisher.Mono;
 
-public interface RouteTriggerStrategy {
+public interface RouteTrigger {
     Mono<Boolean> shouldTriggerRoute(Sensor sensor);
 }

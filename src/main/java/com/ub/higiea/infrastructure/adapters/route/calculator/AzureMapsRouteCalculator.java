@@ -1,10 +1,10 @@
-package com.ub.higiea.infrastructure.adapters.azuremaps;
+package com.ub.higiea.infrastructure.adapters.route.calculator;
 
 import com.azure.core.models.GeoPosition;
 import com.azure.maps.route.MapsRouteAsyncClient;
 import com.azure.maps.route.models.*;
-import com.ub.higiea.application.strategies.RouteCalculationResult;
-import com.ub.higiea.application.strategies.RouteCalculator;
+import com.ub.higiea.application.ports.RouteCalculationResult;
+import com.ub.higiea.application.ports.RouteCalculator;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import reactor.core.publisher.Mono;

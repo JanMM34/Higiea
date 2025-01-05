@@ -1,106 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Sensor Map</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Custom CSS -->
-    <style>
-        /* Map container */
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <title>Sensor Map</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <style>
+            #map {
+                height: 100vh;
+                width: 100%;
+            }
+            .sensor-marker {
+                border-radius: 50%;
+                width: 12px;
+                height: 12px;
+                display: block;
+                border: 2px solid white;
+            }
 
-        /* Sensor marker styles */
-        .sensor-marker {
-            border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            display: block;
-            border: 2px solid white;
-        }
+            .sensor-popup .state-buttons {
+                margin-top: 10px;
+                font-size: 14px;
+            }
 
-        .sensor-popup .state-buttons {
-            margin-top: 10px;
-            font-size: 14px;
-        }
+            .sensor-popup .state-buttons button {
+                margin-right: 5px;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
 
-        .sensor-popup .state-buttons button {
-            margin-right: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
+            .control-panel {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 10px;
+                border-radius: 4px;
+            }
 
-        /* Control panel */
-        .control-panel {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 4px;
-        }
+            .control-panel label,
+            .control-panel select,
+            .control-panel button {
+                display: block;
+                margin-bottom: 10px;
+            }
 
-        .control-panel label,
-        .control-panel select,
-        .control-panel button {
-            display: block;
-            margin-bottom: 10px;
-        }
+            .control-panel button {
+                padding: 5px 10px;
+                cursor: pointer;
+            }
 
-        .control-panel button {
-            padding: 5px 10px;
-            cursor: pointer;
-        }
+            .truck-marker {
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                display: block;
+                border: 2px solid white;
+            }
 
-        /* Truck marker styles */
-        .truck-marker {
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: block;
-            border: 2px solid white;
-        }
+            .route-line {
+                color: blue;
+                weight: 4;
+                opacity: 0.7;
+            }
+        </style>
+    </head>
+    <body>
 
-        /* Route line styles */
-        .route-line {
-            color: blue;
-            weight: 4;
-            opacity: 0.7;
-        }
-    </style>
-</head>
-<body>
+        <div id="map"></div>
 
-<!-- Map container -->
-<div id="map"></div>
+        <div class="control-panel">
+            <label for="zoneSelect">Select Zone:</label>
+            <select id="zoneSelect">
+                <option value="all" selected>All Zones</option>
+                <option value="zone_a">Zone A</option>
+                <option value="zone_b">Zone B</option>
+            </select>
+            <button id="addSensorBtn" disabled>Add New Sensor</button>
+            <label for="truckPlateInput">Truck Plate:</label>
+            <input id="truckPlateInput" type="text" placeholder="Plate Number" />
+            <label for="truckMaxLoadCapacityInput">Max Load Capacity:</label>
+            <input id="truckMaxLoadCapacityInput" type="number" placeholder="e.g. 2000" />
+            <button id="addTruckBtn" disabled>Add New Truck</button>
 
-<!-- Control panel -->
-<div class="control-panel">
-    <label for="zoneSelect">Select Zone:</label>
-    <select id="zoneSelect">
-        <option value="all" selected>All Zones</option>
-        <option value="zone_a">Zone A</option>
-        <option value="zone_b">Zone B</option>
-    </select>
-    <button id="addSensorBtn" disabled>Add New Sensor</button>
-    <label for="truckSelect">Select Truck:</label>
-    <select id="truckSelect">
-        <option value="" disabled selected>Loading trucks...</option>
-    </select>
-</div>
+            <label for="truckSelect">Select Truck:</label>
+            <select id="truckSelect">
+                <option value="" disabled selected>Loading trucks...</option>
+            </select>
+        </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<!-- Axios for HTTP requests -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.js"></script>
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/mqtt/dist/mqtt.js"></script>
 
-<!-- Custom JavaScript -->
-<script type="module" src="script.js"></script>
+        <script type="module" src="script.js"></script>
 
-</body>
+    </body>
 </html>

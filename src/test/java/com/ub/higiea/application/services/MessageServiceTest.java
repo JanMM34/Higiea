@@ -3,8 +3,8 @@ package com.ub.higiea.application.services;
 import com.ub.higiea.application.services.domain.RouteService;
 import com.ub.higiea.application.services.domain.SensorService;
 import com.ub.higiea.application.services.domain.TruckService;
-import com.ub.higiea.application.strategies.RoutePlanningStrategy;
-import com.ub.higiea.application.strategies.RouteTriggerStrategy;
+import com.ub.higiea.application.ports.RoutePlanning;
+import com.ub.higiea.application.ports.RouteTrigger;
 import com.ub.higiea.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,16 +35,16 @@ public class MessageServiceTest {
     private RouteService routeService;
 
     @Mock
-    private RouteTriggerStrategy routeTriggerStrategy;
+    private RouteTrigger routeTrigger;
 
     @Mock
-    private RoutePlanningStrategy routePlanningStrategy;
+    private RoutePlanning routePlanning;
 
     private MessageService messageService;
 
     @BeforeEach
     void setUp() {
-        messageService = new MessageService(sensorService, truckService, routeService, routeTriggerStrategy, routePlanningStrategy);
+        messageService = new MessageService(sensorService, truckService, routeService, routeTrigger, routePlanning);
     }
 
     @Test
@@ -57,10 +57,10 @@ public class MessageServiceTest {
         when(sensorService.updateSensorState(sensorId, state))
                 .thenReturn(Mono.just(updatedSensor));
 
-        when(routeTriggerStrategy.shouldTriggerRoute(updatedSensor))
+        when(routeTrigger.shouldTriggerRoute(updatedSensor))
                 .thenReturn(Mono.just(true));
 
-        when(routePlanningStrategy.prepareRoute())
+        when(routePlanning.prepareRoute())
                 .thenReturn(Mono.just(Tuples.of(
                         Truck.create(UUID.randomUUID(), "1", 150, Location.create(30.0, 40.0)),
                         List.of(updatedSensor)
@@ -78,8 +78,8 @@ public class MessageServiceTest {
                 .verifyComplete();
 
         verify(sensorService, times(1)).updateSensorState(sensorId, state);
-        verify(routeTriggerStrategy, times(1)).shouldTriggerRoute(updatedSensor);
-        verify(routePlanningStrategy, times(1)).prepareRoute();
+        verify(routeTrigger, times(1)).shouldTriggerRoute(updatedSensor);
+        verify(routePlanning, times(1)).prepareRoute();
         verify(routeService, times(1)).calculateAndSaveRoute(any(Truck.class), anyList());
         verify(sensorService, times(1)).assignRouteToSensors(anyList(),any(Route.class));
         verify(truckService, times(1)).assignRouteToTruck(any(Truck.class), any(Route.class));
@@ -95,7 +95,7 @@ public class MessageServiceTest {
         when(sensorService.updateSensorState(sensorId, state))
                 .thenReturn(Mono.just(updatedSensor));
 
-        when(routeTriggerStrategy.shouldTriggerRoute(updatedSensor))
+        when(routeTrigger.shouldTriggerRoute(updatedSensor))
                 .thenReturn(Mono.just(false));
 
         Mono<Void> result = messageService.handleMessage(sensorId, state);
@@ -104,8 +104,8 @@ public class MessageServiceTest {
                 .verifyComplete();
 
         verify(sensorService, times(1)).updateSensorState(sensorId, state);
-        verify(routeTriggerStrategy, times(1)).shouldTriggerRoute(updatedSensor);
-        verifyNoInteractions(routePlanningStrategy, routeService, truckService);
+        verify(routeTrigger, times(1)).shouldTriggerRoute(updatedSensor);
+        verifyNoInteractions(routePlanning, routeService, truckService);
     }
 
 }

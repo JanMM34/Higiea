@@ -1,4 +1,4 @@
-package com.ub.higiea.infrastructure.ports.mqtt;
+package com.ub.higiea.infrastructure.mqtt;
 
 import java.util.UUID;
 

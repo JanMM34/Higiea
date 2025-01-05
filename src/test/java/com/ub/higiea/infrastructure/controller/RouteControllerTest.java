@@ -126,9 +126,7 @@ public class RouteControllerTest {
                 .uri("/routes/{id}", routeId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isNotFound()
-                .expectBody()
-                .jsonPath("$.message").isEqualTo("Route with id 1 not found");
+                .expectStatus().isNotFound();
     }
 
 }

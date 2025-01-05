@@ -1,4 +1,4 @@
-package com.ub.higiea.infrastructure.ports.mqtt;
+package com.ub.higiea.infrastructure.mqtt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ub.higiea.application.services.MessageService;

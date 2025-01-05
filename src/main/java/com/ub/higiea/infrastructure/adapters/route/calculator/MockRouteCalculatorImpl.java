@@ -1,7 +1,7 @@
-package com.ub.higiea.application.strategies.implementations;
+package com.ub.higiea.infrastructure.adapters.route.calculator;
 
-import com.ub.higiea.application.strategies.RouteCalculationResult;
-import com.ub.higiea.application.strategies.RouteCalculator;
+import com.ub.higiea.application.ports.RouteCalculationResult;
+import com.ub.higiea.application.ports.RouteCalculator;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
 import reactor.core.publisher.Mono;
