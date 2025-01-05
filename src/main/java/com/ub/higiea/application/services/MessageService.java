@@ -60,21 +60,8 @@ public class MessageService {
 
     private Mono<Void> handleEmptySensor(Sensor sensor) {
         return routeService.checkIfLastSensor(sensor)
-                .flatMap(isLast -> {
-                    if (isLast) {
-                        log.debug("Sensor {} is the last sensor. Handling last sensor.", sensor);
-                        return handleLastSensor(sensor);
-                    }
-                    return Mono.empty();
-                })
                 .then(sensorService.markSensorUnassigned(sensor))
-                .doOnSuccess(unused -> log.debug("Successfully marked sensor as unassigned: {}", sensor))
                 .doOnError(error -> log.error("Error marking sensor as unassigned: {}", sensor, error));
-    }
-
-    private Mono<Void> handleLastSensor(Sensor sensor) {
-        return routeService.getRouteEntityById(sensor.getAssignedRoute().getId())
-                .flatMap(route -> truckService.unassignRouteFromTruck(route.getTruck().getId())).then();
     }
 
     private Mono<Void> triggerRoute() {
