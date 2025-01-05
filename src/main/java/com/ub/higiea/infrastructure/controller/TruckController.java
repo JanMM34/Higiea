@@ -1,6 +1,7 @@
 package com.ub.higiea.infrastructure.controller;
 
 import com.ub.higiea.application.requests.TruckCreateRequest;
+import com.ub.higiea.application.requests.TruckIdRequest;
 import com.ub.higiea.application.services.domain.TruckService;
 import com.ub.higiea.application.dtos.TruckDTO;
 import com.ub.higiea.application.exception.notfound.TruckNotFoundException;
@@ -36,6 +37,12 @@ public class TruckController {
         return truckService.createTruck(truckCreateRequest)
                 .onErrorMap(ValidationException.class, ex -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ex.getMessage(), ex));
+    }
+
+    @PostMapping("/terminateRoute")
+    public Mono<Void> updateTruck(@Valid @RequestBody TruckIdRequest truckIdRequest) {
+        return truckService.unassignRouteFromTruck(truckIdRequest.getId())
+                .then();
     }
 
 }

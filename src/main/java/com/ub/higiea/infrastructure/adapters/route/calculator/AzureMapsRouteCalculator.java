@@ -7,12 +7,14 @@ import com.ub.higiea.application.ports.RouteCalculationResult;
 import com.ub.higiea.application.ports.RouteCalculator;
 import com.ub.higiea.domain.model.Location;
 import com.ub.higiea.domain.model.Sensor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 public class AzureMapsRouteCalculator implements RouteCalculator {
 
     private final MapsRouteAsyncClient mapsRouteClient;
@@ -26,31 +28,16 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
         return calculateOptimizedRoute(depotBase, sensors)
                 .map(routeDirections -> {
 
-                    // Initialize ordered sensors list with depot base at start and end
-                    List<Sensor> orderedSensors = new ArrayList<>();
-                    orderedSensors.add(null); // Placeholder for depot base at the start
-                    for (int i = 0; i < sensors.size(); i++) {
-                        orderedSensors.add(null); // Initialize with nulls for sensors
-                    }
-                    orderedSensors.add(null); // Placeholder for depot base at the end
+                    List<Sensor> orderedSensors;
 
-                    // Extract optimized waypoints
                     List<RouteOptimizedWaypoint> optimizedWaypoints = routeDirections.getOptimizedWaypoints();
 
-                    // Adjust indices and place sensors in the correct order
-                    for (RouteOptimizedWaypoint waypoint : optimizedWaypoints) {
-                        int providedIndex = waypoint.getProvidedIndex();
-                        int optimizedIndex = waypoint.getOptimizedIndex() + 1; // Increment by 1 to account for the origin
-
-                        // Move the sensor from the provided index to the new optimized index
-                        Sensor sensorToMove = sensors.get(providedIndex);
-                        orderedSensors.set(optimizedIndex, sensorToMove);
-                    }
-
-                    // Optionally, set the depot base at the start and end if you have a Sensor object for it
-                    // Sensor depotSensor = createDepotSensor(depotBase);
-                    // orderedSensors.set(0, depotSensor);
-                    // orderedSensors.set(orderedSensors.size() - 1, depotSensor);
+                    orderedSensors = optimizedWaypoints.stream()
+                            .sorted(Comparator.comparing(RouteOptimizedWaypoint::getOptimizedIndex))
+                            .map(waypoint -> {
+                                Integer providedIdx = waypoint.getProvidedIndex();
+                                return sensors.get(providedIdx);
+                            }).toList();
 
                     Double totalDistance = routeDirections.getRoutes().getFirst().getSummary()
                             .getLengthInMeters().doubleValue();
@@ -65,7 +52,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
 
                     List<Location> routeGeometry = routeGeometryPoints.stream()
                             .map(geoPosition -> Location.create(geoPosition.getLatitude(), geoPosition.getLongitude()))
-                            .toList();
+                            .collect(Collectors.toList());
 
                     return new RouteCalculationResult(orderedSensors, totalDistance, estimatedTimeInSeconds, routeGeometry);
                 });
@@ -90,7 +77,7 @@ public class AzureMapsRouteCalculator implements RouteCalculator {
 
         RouteDirectionsOptions options = new RouteDirectionsOptions(coordinates)
                 .setComputeBestWaypointOrder(true)
-                .setTravelMode(TravelMode.TRUCK)
+                .setTravelMode(TravelMode.CAR)
                 .setRouteType(RouteType.SHORTEST);
 
         return mapsRouteClient.getRouteDirections(options)

@@ -223,6 +223,7 @@ function addTruckMarker(truck) {
         <div>
             <strong>Plate:</strong> ${truck.plate}<br>
             <strong>Max Load Capacity:</strong> ${truck.maxLoadCapacity}
+            <button onclick="terminateRoute('${truck.id}')">Terminate Route</button>
         </div>
     `;
     marker.bindPopup(popupContent);
@@ -262,8 +263,31 @@ function updateSensorState(sensorId, newState) {
         }
     });
 }
-window.updateSensorState = updateSensorState; // Make it callable in popup
 
+function terminateRoute(truckId) {
+    if (!selectedZone || selectedZone === 'all') {
+        alert('Please select a specific zone before terminating a route.');
+        return;
+    }
+
+    const zoneBaseUrl = config.ZONES[selectedZone];
+    axios.post(`${zoneBaseUrl}/trucks/terminateRoute`, { id: truckId })
+        .then((response) => {
+            console.log('Route terminated successfully:', response.data);
+            alert('Route has been terminated.');
+
+            // Optionally reload trucks or clear the route from the map
+            loadTrucks(zoneBaseUrl);
+            clearExistingRoute();
+        })
+        .catch((error) => {
+            console.error('Error terminating route:', error);
+            alert('Failed to terminate route. Check console for details.');
+        });
+}
+
+window.updateSensorState = updateSensorState; // Make it callable in popup
+window.terminateRoute = terminateRoute;
 function updateSensorMarker(sensorId, newState) {
     const marker = sensorMarkers[sensorId];
     if (!marker) {
