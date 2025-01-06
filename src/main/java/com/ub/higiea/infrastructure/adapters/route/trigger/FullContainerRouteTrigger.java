@@ -11,7 +11,7 @@ public class FullContainerRouteTrigger implements RouteTrigger {
 
     @Override
     public Mono<Boolean> shouldTriggerRoute(Sensor sensor) {
-        return Mono.just(sensor.getContainerState() == ContainerState.FULL);
+        return Mono.just(!sensor.hasAssignedRoute() && sensor.getContainerState() == ContainerState.FULL);
     }
 
 }
